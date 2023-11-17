@@ -1,23 +1,48 @@
-To run the project , please first activate the virtual environment otherwise you need to download 
-packages one by one. 
-->To activate the virtual environment open the terminal in the project folder and run the command 
-    source venv/bin/activate
+# Project Name
 
-if you are having problem on windows machines , try this instead
-    venv/bin/activate
+A Shopping Web site project with a database. 
+This is a ITU BLG317E – DATABASE SYSTEMS course project 
+Aim is to design an efficient database with a frontend website
 
--> make sure your your python interpreter is selected as the one in venv/bin
-    press (Ctrl+Shift+P) select python interpreter , select it as ./venv/bin/python
+## Table of Contents
 
-In order to work with databases you need to set paramters user name, database name ,and a password 
-please see set_initials method in the database_manager file
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
 
-after setups run the server file as python server.py 
+## Installation
+
+Brief instructions on how to install/setup your project. Include necessary dependencies, prerequisites, and installation steps.
 
 
-if you are having issues with packages , you can try completely remove the venv file and install it again for this , in your terminal, run the command 
-    run rm -rf venv/  --removes the virtual environment
-    python -m venv venv --or python3 -m venv venv , installs the virtual envrionment with name venv
-    pip install -r requirements.txt -- installs all necessary packages
+Its highly recommended to use a virtual environment for the project , if you dont want to use it you can skip the 3-4-5 steps
+
+For example:
+1. Clone the repository: `git clone https://github.com/yourusername/yourproject.git`
+2. Navigate to the project directory: `cd yourproject`
+3. Install a virtual envrionment with name venv: `python -m venv venv --or python3 -m venv venv`
+4. Activate the virtual environment: 
+        `source venv/bin/activate`, on linux machines
+        `venv/bin/activate`, on windows machines
+5. Set your python interpreter as in the venv file :
+        `Ctrl+Shift+P` -> select python interpreter -> `./venv/bin/python`
+6. Install dependencies: `pip install -r requirements.txt`
+
+## Usage
+
+In order to work with databases you need an active postgres database and set paramters: user name, database name ,and a password accordingly please see `set_initials` method in the `database_manager` file
+
+1. Run the project: `python server.py`
+2. Open your web browser and go to `http://localhost:5000` to view the application.
+
+## Contributing
+
+--
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
 
 

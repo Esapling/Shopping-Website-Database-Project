@@ -1,0 +1,231 @@
+body{
+    background-color: var(--bg-color-2);
+}
+.header{
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 1rem 2%;
+    z-index: 100;
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    background: var(--bg-color-3);
+}
+.header .row{
+    padding: 0 15%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.container-navbar{
+    width: 100%;
+    position: absolute;
+    left: 8%;
+    display: grid;
+    grid-template-columns: 1fr 4fr 2fr;
+
+}
+.container-navbar .container-navbar-ul{
+    display: flex;
+    flex: 1;
+    margin-left: 0.8rem;
+}
+.header .navbar a{
+    font-weight: 600;
+    transition: .8s;
+    font-size: 1.2rem;
+    margin:0 1rem;
+    color: palegoldenrod;
+}
+
+.navbar a:hover{
+    color: greenyellow;
+    text-decoration: underline;
+    transition: .8s
+
+}
+.row .container-catalogue{
+    margin: 1.2% 0;
+}
+.row .nav{
+    gap: 2rem;
+    margin-top: 0.3rem;
+}
+.row .nav li{
+    font-size: 1.5rem;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 600;
+    
+}
+.row .nav li a{
+    color: var(--main-color);
+    transition: .6s;
+    cursor: pointer;
+}
+.row .nav li a:hover{
+    text-decoration: underline;
+}
+section{
+    min-height: 100vh;
+    padding: 4rem 3% 2rem;
+}
+.section-home-container{
+    position: relative;
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow-x:hidden;
+}
+.section-home-container .product-row{
+    display: inline-flex;
+    justify-content: space-between;
+    gap: 10px;
+    flex:1 1 0;
+}
+
+/*CARD*/
+
+p.overview {
+    font-size: 12px;
+    height: 200px;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color:var(--main-color);
+}
+.card {
+    color: inherit;
+    cursor: pointer;
+    width: calc(33% - 10rem);
+    min-width: calc(33% - 10rem);
+    height: 25rem;
+    min-height: 25rem;
+    perspective: 1000px;
+    margin: 1rem auto;
+    position: relative;
+}
+@media screen and (max-width: 800px) {
+    .card {
+        width: calc(50% - 3rem);
+   }
+}
+@media screen and (max-width: 500px) {
+    .card {
+        width: 100%;
+   }
+}
+.front, .back {
+    display: flex;
+    border-radius: 6px;
+    background-position: center;
+    background-size: cover;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    transition: ease-in-out 600ms;
+}
+.front {
+    background-size: cover;
+    padding: 2rem;
+    font-size: 1.618rem;
+    font-weight: 600;
+    color: #fff;
+    overflow: hidden;
+    font-family: Poppins, sans-serif;
+}
+.front:before {
+    position: absolute;
+    display: block;
+    content: '';
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #1a9be6, #1a57e6);
+    opacity: 0.3;
+    z-index: -1;
+}
+.card:hover .front {
+    transform: rotateY(180deg);
+}
+.card:nth-child(even):hover .front {
+    transform: rotateY(-180deg);
+}
+.back {
+    background: #fff;
+    transform: rotateY(-180deg);
+    padding: 0 2em;
+}
+.card:hover .back {
+    transform: rotateY(0deg);
+}
+.card:nth-child(even) .back {
+    transform: rotateY(180deg);
+}
+.card:nth-child(even):hover .back {
+    transform: rotateY(0deg);
+}
+
+.back .buttons{
+    width: 100%;
+    height: auto;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 2fr;
+}
+.back .buttons .icon-fav{
+    padding-top: 0.4rem;
+    grid-area: 2 / 1 / 3 / 3;
+}
+.back .buttons a{
+    font-weight: 500;
+    font: 1.3rem;
+}
+
+.footer{
+    background-color: var(--bg-color-3);
+    color: var(--main-color);
+}
+
+
+
+
+
+
+
+/*
+.back .icon-fav{
+    width: 100%;
+    height: 3rem;
+    margin-bottom: 2%;
+    text-decoration: none;
+    content: "";
+}
+.back .icon-fav a::after{
+    content: "Favorite"; /* The message text */
+    /*
+    position: inherit;
+    display: none; /* Initially hidden 
+    color: var(--bg-color-2); /* Text color for the message 
+    font-size: 1.1rem;
+    padding-bottom: 10%;
+    border-radius: 5px;
+    white-space: nowrap; /* Prevent message from breaking into multiple line
+} 
+.back .icon-fav a:hover::after{
+    display: block; /* Show the message on hover 
+}
+*/
+

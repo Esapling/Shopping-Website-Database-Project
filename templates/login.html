@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{%from 'bootstrap5/form.html' import render_form%}
+
+
+{%block styles%}
+<link rel="stylesheet" href="{{url_for('static', filename='css/login.css')}}">
+
+{%endblock%}
+{%block title%}Sign in{%endblock%}
+
+{%block content%}
+<section class="home-login" id="home-login">
+    <div class="container login-container">
+        <div class="icon">
+            <box-icon type='solid' name='data' size="lg" color="#ededed"></box-icon>
+        </div>
+        <h1 class="heding">Hi there 👋 ,Please Log in</h1>
+        <form class="custom-form" method="POST">
+            {{render_form(form)}}
+        </form>
+        <p>Dont have an account , No worries you can <a href="{{url_for('register_user')}}">Sign up</a></p>
+            <!-- <div class="form-signin">
+            <h1 class="h3 mb-3">Please sign in</h1>
+            <input type="email" id="inputEmail" class="form-control mb-3" placeholder="Email address" required=""
+                autofocus="" name="email">
+            <input type="password" id="inputPassword" class="form-control mb-3" placeholder="Password" required=""
+                name="password">
+            <div class="checkbox mb-3">
+                <label>
+                    <input type="checkbox" value="remember-me"> Remember me
+                </label>
+            </div>
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+            <p class="mt-5 mb-3 text-muted">© 2023 DATABASE Company, Inc, All Rights Reserved</p>
+        </div> -->
+    </div>
+</section>
+
+{% include 'footer.html' %}
+
+
+{%endblock%}

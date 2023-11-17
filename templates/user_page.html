@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{%from 'bootstrap5/form.html' import render_form%}
+
+{%block styles%}
+<link rel="stylesheet" href="{{url_for('static', filename='css/user_page.css')}}" />
+
+{%endblock%}
+{%block content%}
+
+
+<header class="header">
+  <div class="container-navbar">
+    <nav class="navbar">
+      <a class="navbar-brand logo" href="#">
+        <svg xmlns" width="24" height="24" fill="currentColor" class="bi bi-database"
+          viewBox="0 0 16 16">
+          <path
+            d="M4.318 2.687C5.234 2.271 6.536 2 8 2s2.766.27 3.682.687C12.644 3.125 13 3.627 13 4c0 .374-.356.875-1.318 1.313C10.766 5.729 9.464 6 8 6s-2.766-.27-3.682-.687C3.356 4.875 3 4.373 3 4c0-.374.356-.875 1.318-1.313ZM13 5.698V7c0 .374-.356.875-1.318 1.313C10.766 8.729 9.464 9 8 9s-2.766-.27-3.682-.687C3.356 7.875 3 7.373 3 7V5.698c.271.202.58.378.904.525C4.978 6.711 6.427 7 8 7s3.022-.289 4.096-.777A4.92 4.92 0 0 0 13 5.698ZM14 4c0-1.007-.875-1.755-1.904-2.223C11.022 1.289 9.573 1 8 1s-3.022.289-4.096.777C2.875 2.245 2 2.993 2 4v9c0 1.007.875 1.755 1.904 2.223C4.978 15.71 6.427 16 8 16s3.022-.289 4.096-.777C13.125 14.755 14 14.007 14 13V4Zm-1 4.698V10c0 .374-.356.875-1.318 1.313C10.766 11.729 9.464 12 8 12s-2.766-.27-3.682-.687C3.356 10.875 3 10.373 3 10V8.698c.271.202.58.378.904.525C4.978 9.71 6.427 10 8 10s3.022-.289 4.096-.777A4.92 4.92 0 0 0 13 8.698Zm0 3V13c0 .374-.356.875-1.318 1.313C10.766 14.729 9.464 15 8 15s-2.766-.27-3.682-.687C3.356 13.875 3 13.373 3 13v-1.302c.271.202.58.378.904.525C4.978 12.71 6.427 13 8 13s3.022-.289 4.096-.777c.324-.147.633-.323.904-.525Z" />
+        </svg>
+        DATABASE</a>
+      <div class="container-items">
+        <a class="nav-link" href="{{url_for('login')}}">Log in</a>
+        <a class="nav-link" href="#">Box</a>
+      </div>
+    </nav>
+  </div>
+
+</header>
+
+
+
+<section class="section section-user" id="section-user">
+  <div class="container-user">
+    <div class="icon">
+      <svg xmlns="http://www.w3.org/2000/svg" height="10rem"  width="10rem" viewBox="0 0 448 512">
+        <style>
+          svg{fill:#ededed}
+        </style>        
+        <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M304 128a80 80 0 1 0 -160 0 80 80 0 1 0 160 0zM96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM49.3 464H398.7c-8.9-63.3-63.3-112-129-112H178.3c-65.7 0-120.1 48.7-129 112zM0 482.3C0 383.8 79.8 304 178.3 304h91.4C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3z"/></svg>
+      <!--
+      <svg xmlns="http://www.w3.org/2000/svg" height="10rem" width="10rem" viewBox="0 0 448 512">
+        <style>
+          svg{fill:#ededed}
+        </style>
+      -->
+        <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
+        
+        <path d="M448 80v48c0 44.2-100.3 80-224 80S0 172.2 0 128V80C0 35.8 100.3 0 224 0S448 35.8 448 80zM393.2 214.7c20.8-7.4 39.9-16.9 54.8-28.6V288c0 44.2-100.3 80-224 80S0 332.2 0 288V186.1c14.9 11.8 34 21.2 54.8 28.6C99.7 230.7 159.5 240 224 240s124.3-9.3 169.2-25.3zM0 346.1c14.9 11.8 34 21.2 54.8 28.6C99.7 390.7 159.5 400 224 400s124.3-9.3 169.2-25.3c20.8-7.4 39.9-16.9 54.8-28.6V432c0 44.2-100.3 80-224 80S0 476.2 0 432V346.1z"/></svg>
+      </div>
+    <div class="user-details">
+      <div class="info-col">
+        <div class="info-item">
+          <h3 class="title-info">Name</h3>
+          <p class="value-info">Enes</p>
+        </div>
+        <div class="info-item">
+          <h3 class="title-info">Phone</h3>
+          <p class="value-info">905454516135</p>
+        </div>
+        <div class="info-item">
+          <h3 class="title-info">Email</h3>
+          <p class="value-info">test@database.com</p>
+        </div>
+      </div>
+      <div class="info-col">
+        <div class="info-item">
+          <h3 class="title-info">Password</h3>
+          <p class="value-info">testpassword123</p>
+        </div>
+        <div class="info-item">
+          <h3 class="title-info">Address</h3>
+          <p class="value-info">ITU AYAZAGA</p>
+        </div>
+        <div class="info-item">
+          <button class="btn btn-outline-success" type="submit">Update</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% include 'footer.html' %}
+
+{%endblock%}

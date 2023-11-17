@@ -1,0 +1,58 @@
+
+.home-login{
+    position: relative;
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+}
+
+.home-login .login-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 5% 2% 5% 0;
+    padding: 8% 4%;  
+}
+.login-container .icon{
+    left: 4rem;
+}
+.login-container h1{
+    font-weight: 600;
+}
+.form-signin{
+    display: block;
+    width: 50%;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+}
+.home-login .custom-form{
+    position: relative;
+    width: 80%;
+    max-width: 100%;
+}
+
+@media screen and (max-width: 800px) {
+    .home-login{
+        height: 80vh;
+        text-align: center;
+    }
+    .custom-form{
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: auto;
+    }
+    .custom-form .submit-field{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+}

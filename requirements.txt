@@ -1,0 +1,5 @@
+bootstrap-flask
+flask
+email_validator
+flask_wtf
+psycopg

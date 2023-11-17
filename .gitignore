@@ -1,0 +1,6 @@
+*.txt
+!requirements.txt
+*.xlsx
+*.ods
+templates/card.html
+images/

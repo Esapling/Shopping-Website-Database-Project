@@ -1,0 +1,22 @@
+{%extends 'base.html' %}
+{%from 'bootstrap5/form.html' import render_form%}
+
+{%block styles%}
+
+{%endblock%}
+
+{%block title%}Register{%endblock%}
+
+{%block content%}
+
+    <section>
+        <div class="home-register">
+            <p class="heading">Welcome 👋👋👋</p>
+            <form class="custom-form" method="POST">
+                {{render_form(form)}}
+            </form>
+        </div>
+    </section>
+
+
+{%endblock%}

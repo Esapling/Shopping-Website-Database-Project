@@ -1,0 +1,22 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+    border:none;
+    outline: none;
+    scroll-behavior: smooth;
+}
+:root{
+    --bg-color: aqua;
+    --text-color: black;
+    --text-color-2:#ededed;
+    --bg-color-2:#081b29;
+    --bg-color-3:#112e42;
+    --main-color:#00abf0;
+}
+
+body{
+    background-color: var(--bg-color-3);
+    color: var(--main-color);
+}

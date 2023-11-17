@@ -1,0 +1,89 @@
+
+.section{
+    width: 100%;
+    height:100vh;
+    position: relative;
+}
+.header{
+    width: 100%;
+    height: auto;
+    position: relative;
+    top: 0;
+    left: 0;
+    padding: 1.5rem 2%;
+    z-index: 100;
+    background-color: var(--bg-color-3);
+}
+
+.container-navbar{
+    width: 100%;
+    display: flex;
+    padding: 0 3%;
+    flex-direction: column;
+    justify-content: space-around;
+}
+.container-navbar .container-items{
+    width: 40%;
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+}
+.container-navbar a{
+    font-size: 1.7rem;
+    font-weight:700;
+    color: var(--text-color-2);
+}
+.container-navbar a:hover{
+    color: greenyellow;
+    text-decoration: underline;
+    transition: .6s;
+}
+
+.section-user .container-user{
+    width: 100%;
+    height: auto;
+    position: relative;
+    padding: 7%;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-user .icon{
+    position: relative;
+    margin: 0 4rem;
+}
+.user-details{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+.user-details .info-item h3{
+    text-align: start;
+}
+
+.user-details .info-item p{
+    width: 80%;
+    height: 100%;
+    padding: 1rem;
+    font-size: 1rem;    
+    color: var(--main-color);
+    background: transparent;
+    border: .2rem solid var(--main-color);
+    border-radius: .6rem;
+}
+.info-item button{
+    position: relative;
+    margin: 10% 0;
+    width: 80%;
+    height: 4rem;
+    transition: 0.5s;
+    border: .2rem solid var(--main-color);
+    color: var(--main-color);
+}
+
+
+/*
+
+.user-details .info-col{
+}

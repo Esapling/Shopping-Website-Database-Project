@@ -4,3 +4,4 @@
 *.ods
 templates/card.html
 images/
+venv/

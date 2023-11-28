@@ -1,17 +1,21 @@
 create table CATEGORY (
 	category_id SERIAL PRIMARY KEY NOT NULL UNIQUE,
 	category_name VARCHAR(50) UNIQUE NOT NULL,
-    --products INT[10] FOREIGN KEY references products (product_id) 
+	store_id INT,
+	FOREIGN KEY (store_id) REFERENCES STORE (store_id) -- is this really necessary
+             --ON DELETE SET NULL 
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
 );
-insert into CATEGORY (category_id, category_name) values (1, 'Electronics');
-insert into CATEGORY (category_id, category_name) values (2, 'Grocery');
-insert into CATEGORY (category_id, category_name) values (3, 'Automotive');
-insert into CATEGORY (category_id, category_name) values (4, 'Kids');
-insert into CATEGORY (category_id, category_name) values (5, 'Health');
-insert into CATEGORY (category_id, category_name) values (6, 'Clothing');
-insert into CATEGORY (category_id, category_name) values (7, 'Home');
-insert into CATEGORY (category_id, category_name) values (8, 'Books');
-insert into CATEGORY (category_id, category_name) values (9, 'Industrial');
+insert into CATEGORY (category_name,store_id) values ('Electronics',1);
+insert into CATEGORY (category_name,store_id) values ('Grocery',1);
+insert into CATEGORY (category_name,store_id) values ('Automotive',1);
+insert into CATEGORY (category_name,store_id) values ('Kids',1);
+insert into CATEGORY (category_name,store_id) values ('Health',1);
+insert into CATEGORY (category_name,store_id) values ('Clothing',1);
+insert into CATEGORY (category_name,store_id) values ('Home',1);
+insert into CATEGORY (category_name,store_id) values ('Books',1);
+insert into CATEGORY (category_name,store_id) values ('Industrial',1);
 
 -- insert into CATEGORY (category_id, category_name) values (14, 'Games');
 -- insert into CATEGORY (category_id, category_name) values (15, 'Jewelry');

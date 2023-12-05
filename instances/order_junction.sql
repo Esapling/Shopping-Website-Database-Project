@@ -1,34 +1,37 @@
--- look up to this table while searching for item in a shop or in a category
--- be careful while querying and about data integrity
+-- look up table while searching for order details 
 -- receipt table in other words
 CREATE TABLE ORDER_JUNCTION (
-    order_id INT REFERENCES ORDER (order_id)
+    order_id INT REFERENCES PURCHASE_ORDER (order_id)
             ON DELETE CASCADE 
-            ON UPDATE CASCADE, --can it be possible for an order id to be changed ?? 
+            ON UPDATE CASCADE, --is it possible for an order id to be changed ?? 
 
-    customer_id INT NOT NULL FOREIGN KEY REFERENCES CUSTOMER 
-        ON DELETE SET NULL  --even if the user records deleted from the server
-                            -- we might want to keep just previous oreders for our sake
-        ON UPDATE CASCADE  ,
-
-
-    product_id INT NOT NULL REFERENCES STORE (store_id) 
-            ON DELETE CASCADE 
+    product_id INT NOT NULL REFERENCES PRODUCT (product_id) 
+            ON DELETE RESTRICT -- an order of which ordered products are not known ???
             ON UPDATE CASCADE,
     
     product_amount INT NOT NULL 
-        CHECK (product_amount >= 0),  --cannot be larger than the inventory(stock) amount
+        CHECK (product_amount >= 0),  --cannot be larger than the inventory(stock) amount --trigger
 
-    PRIMARY KEY (product_id, customer_id, product_id)
+    unit_product_price DOUBLE PRECISION NOT NULL  -- use trigger to fill this field automatically
+        CHECK (unit_product_price >= 0),
+    PRIMARY KEY (order_id, product_id)
 );
 
---  order 1 includes product 1 amount of 2 by customer 1
-INSERT INTO ORDER_JUNCTION (order_id, customer_id, product_id, product_amount) VALUES (1,1, 2, 1);
- 
---order 1 includes product 2 amount of 3 by customer 1
-INSERT INTO ORDER_JUNCTION (order_id, customer_id, product_id, product_amount) VALUES (1,1, 3, 2);
+--  order 1 includes product 1 amount of 2
+--INSERT INTO ORDER_JUNCTION (order_id, product_id, product_amount, unit_product_price) VALUES (1,1, 2, 11);
+--order 1 includes product 2 amount of 3
+-- INSERT INTO ORDER_JUNCTION (order_id, product_id, product_amount,unit_product_price) VALUES (1,2, 3, 14);
+-- --order 1 includes product 3 amount 1INSERT INTO ORDER_JUNCTION (order_id, product_id, product_amount,unit_product_price) VALUES (1,3, 1, 9.99);
 
---order 1 includes product 3 amount 1 by customer 1
-INSERT INTO ORDER_JUNCTION (order_id, customer_id, product_id, product_amount) VALUES (1,1, 1, 3);
+-- -- so order 1 total of 2 + 3 + 1 products 
+-- -- total order amount = 2*11 + 3*14 + 1*9.99
 
--- so order 1 total of 2 + 3 + 1 products by customer 1 
+-- --  order 2 includes product 1 amount of 3
+-- INSERT INTO ORDER_JUNCTION (order_id, product_id, product_amount, unit_product_price) VALUES (2,1, 3, 15);
+-- --order 2 includes product 2 amount of 1
+-- INSERT INTO ORDER_JUNCTION (order_id, product_id, product_amount,unit_product_price) VALUES (2,2, 1, 12);
+-- --order 2 includes product 3 amount 2
+-- INSERT INTO ORDER_JUNCTION (order_id, product_id, product_amount,unit_product_price) VALUES (2,3, 2, 10);
+-- --order 2 includes product 4 amount 4
+-- INSERT INTO ORDER_JUNCTION (order_id, product_id, product_amount,unit_product_price) VALUES (2,4, 4, 11.50);
+

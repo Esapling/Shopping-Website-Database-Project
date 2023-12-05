@@ -19,4 +19,13 @@ CREATE TABLE PRODUCT(
              ON UPDATE CASCADE
 
 );
+INSERT INTO PRODUCT (product_name, inventory, price,category_id, store_id) VALUES ('Phone',    50,  250,1,1);
+INSERT INTO PRODUCT (product_name, inventory, price,category_id, store_id) VALUES ('Computer', 50,  899, 1,1);
+INSERT INTO PRODUCT (product_name, inventory, price,category_id, store_id) VALUES ('Ipad',     50,  450, 1,1);
+INSERT INTO PRODUCT (product_name, inventory, price,category_id, store_id) VALUES ('Airpods',  50,  50,  1,1);
+INSERT INTO PRODUCT (product_name, inventory, price,category_id, store_id) VALUES ('Laptop',   50,  1499,1,1);
+INSERT INTO PRODUCT (product_name, inventory, price,category_id, store_id) VALUES ('Phone',    50,  450, 1,1);
+INSERT INTO PRODUCT (product_name, inventory, price,category_id, store_id) VALUES ('Computer', 50,  630, 1,1);
+INSERT INTO PRODUCT (product_name, inventory, price,category_id, store_id) VALUES ('Ipad',     50,  430, 1,1);
+INSERT INTO PRODUCT (product_name, inventory, price,category_id, store_id) VALUES ('Airpods',  50,  100, 1,1);
 

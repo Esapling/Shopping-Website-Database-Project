@@ -1,0 +1,23 @@
+CREATE OR REPLACE FUNCTION PRICE_CALCULATOR()
+RETURNS TRIGGER
+LANGUAGE PLPGSQL
+AS $$
+DECLARE
+    price DOUBLE PRECISION;
+BEGIN
+    SELECT total_price
+        INTO price
+        FROM PURCHASE_ORDER as p
+        WHERE p.order_id = NEW.order_id;
+
+        UPDATE PURCHASE_ORDER as p
+        SET total_price = price + (NEW.unit_product_price * NEW.product_amount)
+        WHERE p.order_id = NEW.order_id;
+    RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE TRIGGER PRICE_CALC_TRIG_INSERT
+AFTER INSERT ON ORDER_JUNCTION
+FOR EACH ROW
+EXECUTE FUNCTION PRICE_CALCULATOR();

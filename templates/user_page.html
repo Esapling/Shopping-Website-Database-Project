@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
-{%from 'bootstrap5/form.html' import render_form%}
 
 {%block styles%}
 <link rel="stylesheet" href="{{url_for('static', filename='css/user_page.css')}}" />
-
 {%endblock%}
+
+{%from 'bootstrap5/form.html' import render_form%}
 {%block content%}
 
 
@@ -51,29 +51,29 @@
       <div class="info-col">
         <div class="info-item">
           <h3 class="title-info">Name</h3>
-          <p class="value-info">Enes</p>
+          <p class="value-info">{{customer[0]}}</p>
         </div>
         <div class="info-item">
           <h3 class="title-info">Phone</h3>
-          <p class="value-info">905454516135</p>
+          <p class="value-info">{{customer[1]}}</p>
         </div>
         <div class="info-item">
           <h3 class="title-info">Email</h3>
-          <p class="value-info">test@database.com</p>
+          <p class="value-info">{{email}}</p>
         </div>
       </div>
       <div class="info-col">
         <div class="info-item">
-          <h3 class="title-info">Password</h3>
-          <p class="value-info">testpassword123</p>
-        </div>
-        <div class="info-item">
           <h3 class="title-info">Address</h3>
-          <p class="value-info">ITU AYAZAGA</p>
+          <p class="value-info">{{customer[2]}}</p>
         </div>
         <div class="info-item">
-          <button class="btn btn-outline-success" type="submit">Update</button>
+          <button class="btn btn-outline-success" type="submit">See Shop History</button>
         </div>
+        <div class="info-item">
+          <button class="btn btn-outline-success" type="submit">Update User Data</button>
+        </div>
+
       </div>
     </div>
   </div>

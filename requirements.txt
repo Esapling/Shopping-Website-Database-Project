@@ -3,3 +3,4 @@ flask
 email_validator
 flask_wtf
 psycopg
+passlib

@@ -1,0 +1,58 @@
+{% extends 'base.html' %} 
+{%from 'bootstrap5/form.html' import render_form%}
+
+
+{%block styles%}
+<link rel="stylesheet" href="{{url_for('static', filename='css/sign_up.css')}}" />
+
+{%endblock%}
+{%block title%}Sign Up{%endblock%}
+
+
+{%block content%}
+
+
+<section class="section-form" id="section-form">
+<h1 class="heading" >Hi there 👋 ,Please Sign up</h1>
+
+<form class="custom-form" method="POST">
+  {{render_form(form)}}
+</form>
+
+<!-- <form action="#" class="form-class">
+  <div class="user-details">
+    <div class="info-col">
+      <div class="info-item">
+        <h3 class="title-info">Name</h3>
+        <input type="text" name="name" id="name" placeholder="name" required>
+      </div>
+      <div class="info-item">
+        <h3 class="title-info">Phone</h3>
+        <input type="text" name="phone" id="phone" placeholder="Phone" required>
+      </div>
+      <div class="info-item">
+        <h3 class="title-info">Email</h3>
+        <input type="email" name="email" id="email" placeholder="email" required>
+      </div>
+    </div>
+    <div class="info-col">
+      <div class="info-item">
+        <h3 class="title-info">Password</h3>
+        <input type="text" name="password" id="password" placeholder="Password" required>
+      </div>
+      <div class="info-item">
+        <h3 class="title-info">Address</h3>
+        <input type="text" name="address" id="address" placeholder="Address" required>
+      </div>
+      <div class="info-item">
+        <input type="submit" class="input-button" value="Subscribe!" />
+      </div>
+    </div>
+  </div>
+
+</form> -->
+</section>
+
+
+{% include 'footer.html' %}
+{%endblock%}

@@ -1,3 +1,6 @@
+--related table and functioon is deleted
+--customer and registered user table combined into one table
+
 CREATE OR REPLACE FUNCTION IS_REGISTERED_FLAG_TRIGGER_FUNC()
 RETURNS TRIGGER
 LANGUAGE PLPGSQL

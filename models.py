@@ -7,3 +7,13 @@ class LoginForm(FlaskForm):
     email = StringField("email", validators=[DataRequired(), validators.Email()] ,render_kw={"class":"email-field"})
     password = PasswordField("password", validators=[DataRequired(), validators.Length(min=8)], render_kw={"class":"pasword-field"})
     submit = SubmitField("submit", render_kw={"class": "submit-field"})
+
+
+class SignUpForm(FlaskForm):
+    name = StringField("name", validators=[DataRequired()] ,render_kw={"class":"input-field"})
+    phone = StringField("phone", validators=[DataRequired(), validators.Length(min=8)] ,render_kw={"class":"input-field"})
+    email = StringField("email", validators=[DataRequired(), validators.Email()] ,render_kw={"class":"input-field"})
+    password = StringField("password", validators=[DataRequired(), validators.Length(min=8)] ,render_kw={"class":"input-field"})
+    address = StringField("address", validators=[DataRequired(), validators.Length(min=8)] ,render_kw={"class":"input-field"})
+    submit = SubmitField("submit", render_kw={"class": "submit-field"})
+    

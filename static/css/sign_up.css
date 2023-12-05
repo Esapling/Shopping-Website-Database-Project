@@ -1,0 +1,92 @@
+
+.section-form{
+    width: 100%;
+    height: 78vh;
+    position: relative;
+    top: 0;
+    left: 0;
+    padding: 1.5rem 2%;
+    z-index: 100;
+    background-color: var(--bg-color-3);
+    margin-bottom: 2%;
+}
+
+.section-form .heading{
+    margin-top: 3%;
+    margin-left: 30%;
+}
+
+.section-form .form-class{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    padding: 4%;
+}
+ .form-class .user-details{
+    /* padding: 3% 8%; */
+    width: 100%;
+    height: 30rem;
+    display:flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.user-details .info-col{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.form-class .user-details input{
+    height: 3.2rem;
+    width: 80%;
+    color: var(--main-color);
+    background: transparent;
+    border: .2rem solid var(--main-color);
+    border-radius: .6rem;
+    margin: 0 2% 2% 0;
+}
+
+
+.user-details .info-item h3{
+    text-align: flex-start;
+    }
+
+.info-item .input-button{
+    width: 80%;
+    height: 5rem;
+    transition: 0.5s;
+    border: .2rem solid var(--main-color);
+    color: var(--main-color);
+    margin-top: 40px;
+}
+/*
+
+.container-navbar{
+    width: 100%;
+    display: flex;
+    padding: 0 3%;
+    flex-direction: column;
+    justify-content: space-around;
+}
+.container-navbar .container-items{
+    width: 40%;
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+}
+.container-navbar a{
+    font-size: 1.7rem;
+    font-weight:700;
+    color: var(--text-color-2);
+}
+.container-navbar a:hover{
+    color: greenyellow;
+    text-decoration: underline;
+    transition: .6s;
+}
+
+
+
+.user-details .info-col{
+}

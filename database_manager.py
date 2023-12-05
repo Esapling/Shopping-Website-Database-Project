@@ -53,3 +53,10 @@ class DatabaseManagement:
                 data = cur.fetchall()
                 return data
     
+
+if __name__ == "__main__":
+    db = DatabaseManagement("customer")
+    #
+    # db.exectue_sqlscript("instances/price_trigger.sql")
+    x = db.getById(4)
+    print(x)

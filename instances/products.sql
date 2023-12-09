@@ -28,4 +28,6 @@ INSERT INTO PRODUCT (product_name, inventory, price,category_id, store_id) VALUE
 INSERT INTO PRODUCT (product_name, inventory, price,category_id, store_id) VALUES ('Computer', 50,  630, 1,1);
 INSERT INTO PRODUCT (product_name, inventory, price,category_id, store_id) VALUES ('Ipad',     50,  430, 1,1);
 INSERT INTO PRODUCT (product_name, inventory, price,category_id, store_id) VALUES ('Airpods',  50,  100, 1,1);
+    
+    
 

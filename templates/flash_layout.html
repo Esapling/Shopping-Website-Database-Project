@@ -1,0 +1,9 @@
+{%with messages = get_flashed_messages()%}
+{% if messages %}
+    <ul class="flashes">
+        {%for message in messages %}
+        <li><h2 class="flash-message">{{message}}</h2></li>
+        {%endfor%}
+    </ul>
+{%endif%}
+{%endwith%}

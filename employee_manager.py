@@ -1,3 +1,4 @@
+import psycopg
 from database_manager import DatabaseManagement
 
 class Employee(DatabaseManagement):

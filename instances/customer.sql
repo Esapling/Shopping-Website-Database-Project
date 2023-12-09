@@ -7,3 +7,4 @@ CREATE TABLE CUSTOMER(
     customer_email VARCHAR(100) UNIQUE,
     customer_password VARCHAR(100)
 );
+

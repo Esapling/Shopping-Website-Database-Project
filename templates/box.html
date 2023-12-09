@@ -11,20 +11,14 @@
 {%block content%}
 <section class="home-login" id="home-login">
     <div class="container login-container">
-    <a href="{{url_for('home')}}">
         <div class="icon">
             <box-icon type='solid' name='data' size="lg" color="#ededed"></box-icon>
         </div>
-    </a>
-        {% if msg %}
-            <h1 class="heading">{{msg}}</h1>
-        {% else %}
-            <h1 class="heading">Hi there 👋 ,Please Log in</h1>
-        {%endif%}
+        <h1 class="heding">Hi there 👋 ,Please Log in</h1>
         <form class="custom-form" method="POST">
             {{render_form(form)}}
         </form>
-        <p>Dont have an account , No worries you can <a href="{{url_for('sign_up')}}">Sign up</a></p>
+        <p>Dont have an account , No worries you can <a href="{{url_for('register_user')}}">Sign up</a></p>
             <!-- <div class="form-signin">
             <h1 class="h3 mb-3">Please sign in</h1>
             <input type="email" id="inputEmail" class="form-control mb-3" placeholder="Email address" required=""

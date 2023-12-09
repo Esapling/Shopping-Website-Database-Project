@@ -3,6 +3,49 @@ from database_manager import DatabaseManagement
 
 from utilities import hashPassword, verifyPassword
 
+class FavBox(DatabaseManagement):
+    def __init__(self) -> None:
+        super().__init__(table_name="CUSTOMER_FAV_BOXES")
+
+    def addItemToFavBox(self,customer_id: int, product_id : int):
+        with psycopg.connect(**self.db_params)as connection:
+            with connection.cursor() as cur:
+                query = f"INSERT INTO {self.table_name} (customer_id, product_id) VALUES (%s, %s)"
+                cur.execute(query, (customer_id, product_id))
+            
+            connection.commit()
+
+    def getItems(self, customer_id):
+        with psycopg.connect(**self.db_params)as connection:
+            with connection.cursor() as cur:
+                query = f"SELECT product_id from {self.table_name} where customer_id = %s"
+                cur.execute(query, (customer_id,))
+                products =cur.fetchall()
+        return products
+
+class ShopBox(DatabaseManagement):
+    def __init__(self) -> None:
+        super().__init__(table_name="CUSTOMER_SHOP_BOX")
+
+    def addItemToShopBox(self,customer_id: int, product_id : int):
+        with psycopg.connect(**self.db_params)as connection:
+            with connection.cursor() as cur:
+                query = f"INSERT INTO {self.table_name} (customer_id, product_id) VALUES (%s, %s)"
+                cur.execute(query, (customer_id, product_id))
+            connection.commit()
+
+    def getItems(self, customer_id):
+        with psycopg.connect(**self.db_params)as connection:
+            with connection.cursor() as cur:
+                query = f"SELECT product_id from {self.table_name} where customer_id = %s"
+                cur.execute(query, (customer_id,))
+                products =cur.fetchall()
+        return products
+
+
+
+
+
 class Customer(DatabaseManagement):
     def __init__(self) -> None:
         super().__init__(table_name="customer")
@@ -67,7 +110,17 @@ class Customer(DatabaseManagement):
                 else:
                     return customer[0] # customer tuple object[0] - id value 
         
-
+    def getCustomerIdByEmail(self, customer_email):
+        with psycopg.connect(**self.db_params)as connection:
+            with connection.cursor() as cur:
+                query = f"SELECT customer_id from {self.table_name} where customer_email = %s"
+                cur.execute(query, (customer_email,))
+                customer = cur.fetchone()
+                if customer == None:
+                    return None
+                else:
+                    return customer[0] # customer tuple object[0] - id value 
+        
     #login
     def validataCustomerRegistered(self, email_addr, password):
         """
@@ -112,7 +165,7 @@ class Customer(DatabaseManagement):
                 is_registered = cur.fetchone()
                 return is_registered
 
-   
+
         
     # def getCustomerIdByEmail(self, email):
     #     """ This method returns None if no user exists with given email

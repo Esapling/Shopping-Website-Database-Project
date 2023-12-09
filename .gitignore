@@ -2,6 +2,6 @@
 !requirements.txt
 *.xlsx
 *.ods
-templates/card.html
+#templates/card.html
 images/
 venv/

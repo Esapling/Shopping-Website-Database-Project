@@ -1,0 +1,43 @@
+<div class="card">
+  <div
+    class="front"
+    style="background: url('{{image_url}}');  background-size: cover; background-position: center;">
+    <p class="large">{{product[1]}}</p>
+  </div>
+  <div class="back" style="padding-left: 0px; padding-right: 0px">
+    <div class="container">
+      <div class="title">{{product[1]}}</div>
+      <div class="rating">
+        <label>{{product[3]}} $</label>
+        <i class="fas fa-star star"></i>
+      </div>
+      <p class="review">Lorem ipsum dolor sit amet consectetur adipisicing.</p>
+      <p class="overview">
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi rem
+        laboriosam adipisci qui quasi expedita ut accusamus, earum illum amet.
+      </p>
+      <div class="buttons">
+        <a href="#" class="button">
+          <i class="fa-solid fa-turkish-lira-sign fa-fade fa-lg" style="color: #2ec27e;"></i>
+        </a>
+        <a href="{{url_for('add_shopbox', product_id=product[0])}}" class="button button-delete"
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            fill="currentColor"
+            class="bi bi-cart"
+            viewBox="0 0 16 16">
+            <path
+              d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"
+            /></svg
+        ></a>
+        <div class="icon-fav">
+          <a href="{{url_for('add_favs', product_id=product[0])}}">
+            <i class="fa-regular fa-heart fa-beat fa-lg" style="color: #c01c28;"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

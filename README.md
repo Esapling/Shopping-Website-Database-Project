@@ -31,7 +31,7 @@ For example:
 
 ## Usage
 
-In order to work with databases you need an active postgres database and set paramters: user name, database name ,and a password accordingly please see `set_initials` method in the `database_manager` file
+In order to work with databases you need an active postgres database and set paramaters: user name, database name ,and a password accordingly please see `set_initials` method in the `database_manager` file
 
 1. Run the project: `python server.py`
 2. Open your web browser and go to `http://localhost:5000` to view the application.

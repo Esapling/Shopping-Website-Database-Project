@@ -1,6 +1,9 @@
 bootstrap-flask
-flask
+flask~=3.0.0
 email_validator
 flask_wtf
-psycopg
-passlib
+psycopg~=3.1.14
+passlib~=1.7.4
+cryptography~=41.0.7
+wtforms~=3.1.1
+bcrypt

@@ -47,10 +47,14 @@
     margin: 0 2% 2% 0;
 }
 
+.user-details .info-item {
+    display: flex;
+    justify-content: flex-start;
+}
 
 .user-details .info-item h3{
-    text-align: flex-start;
-    }
+    text-align: left;
+}
 
 .info-item .input-button{
     width: 80%;

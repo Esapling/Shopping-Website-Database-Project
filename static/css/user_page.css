@@ -72,6 +72,23 @@
     border: .2rem solid var(--main-color);
     border-radius: .6rem;   
 }
+
+.user-details .info-item input {
+    width: 80%;
+    height: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+    color: var(--main-color);
+    background: transparent;
+    border: .2rem solid var(--main-color);
+    border-radius: .6rem;
+}
+
+.user-details .info-item label {
+    text-align: start;
+    display: block;
+}
+
 .info-item button{
     position: relative;
     margin: 10% 0;

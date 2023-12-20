@@ -5,6 +5,6 @@ CREATE TABLE CUSTOMER_FAV_BOXES(
         ON UPDATE CASCADE,
         
     product_id INT NOT NULL REFERENCES PRODUCT (product_id) 
-            ON DELETE CASCADE -- you missed the possiblity of buying the relevan item sadly :)
-            ON UPDATE CASCADE,
+            ON DELETE CASCADE -- you missed the possibility of buying the relevant item sadly :)
+            ON UPDATE CASCADE
 );

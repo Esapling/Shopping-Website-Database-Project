@@ -1,6 +1,8 @@
 #! venv/bin/python3
 from flask import Flask, render_template, redirect, url_for, request, flash, session, jsonify
 from flask_bootstrap import Bootstrap5
+from flask_wtf.csrf import CSRFProtect
+
 from models import LoginForm, SignUpForm, UpdateProfileForm
 import os
 from database_manager import DatabaseManagement
@@ -12,6 +14,7 @@ from random import shuffle
 from config import DEBUG, PORT, username, password, database
 
 # from regUserManager import RegUser
+from utilities import hashPassword
 
 SECRET_KEY = os.urandom(32)
 
@@ -20,9 +23,49 @@ app = Flask(__name__)
 app.secret_key = SECRET_KEY
 bootstrap = Bootstrap5(app)
 
+csrf = CSRFProtect()
+csrf.init_app(app)
 
-# seperate relative methods in diff modules with classes
+# separate relative methods in diff modules with classes
 
+"""
+    TODO:
+        [ ] User Profile
+            [~] Update
+            [ ] Delete
+        [ ] Favorites
+            [ ] Insert
+            [ ] Delete
+        [ ] Items more(?)
+            [ ] Sort alphabetical
+            [ ] Sort cost
+        [ ] Buying
+            [ ] Add to cart
+            [ ] Payment (?)
+            [ ] Stock control
+        [ ] Shoppingcart/box
+            [ ] See past transactions
+            [ ] Bill
+        [ ] Admin
+            [ ] Add new item
+            [ ] Delete item
+            [ ] Update item
+            [ ] Add new category
+            [ ] Delete category
+            [ ] Update category
+            [ ] Add new user
+            [ ] Delete user
+            [ ] Update user
+            [ ] See all transactions
+            [ ] See all users
+            [ ] See all items
+            [ ] See all categories
+            [ ] See all favorites
+            [ ] See all shopping carts
+            [ ] See all users
+        [ ] Searchbox
+            
+"""
 
 @app.route("/favourites/<product_id>")
 def add_shopbox(product_id):
@@ -180,14 +223,15 @@ def sign_up(msg=None):
 def update_profile():
     updateProfileForm = UpdateProfileForm()
     if request.method == 'GET':
-        return render_template('update_profile.html', form=updateProfileForm)
+        customer_obj = Customer()
+        customer = customer_obj.getCustomerByEmail(email=session['user_email'])
+        return render_template('update_profile.html', customer=customer, form=updateProfileForm)
     elif request.method == 'POST' and updateProfileForm.validate_on_submit():
         customer_dict = {
             "name": updateProfileForm.name.data,
             "phone": updateProfileForm.phone.data,
             "address": updateProfileForm.address.data,
-            "email": updateProfileForm.email.data,
-            "password": updateProfileForm.password.data
+            "email": updateProfileForm.email.data
         }
         customer_obj = Customer()
         customer_id = customer_obj.checkCustomerExistByPhone(customer_phone=customer_dict['phone'])

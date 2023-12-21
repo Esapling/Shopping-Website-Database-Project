@@ -1,9 +1,10 @@
 #! venv/bin/python3
 from flask import Flask, render_template, redirect, url_for, request, flash, session, jsonify
 from flask_bootstrap import Bootstrap5
+from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect
 
-from models import LoginForm, SignUpForm, UpdateProfileForm
+from models import LoginForm, SignUpForm, UpdateProfileForm, DeleteUserForm
 import os
 from database_manager import DatabaseManagement
 from category_manager import Category
@@ -28,24 +29,29 @@ csrf.init_app(app)
 
 # separate relative methods in diff modules with classes
 
-"""
+""" 
     TODO:
-        [ ] User Profile
-            [~] Update
-            [ ] Delete
-        [ ] Favorites
-            [ ] Insert
-            [ ] Delete
+        [⏳] User Profile
+            [✔] Update
+            [⏳] Delete  (warn user before delete)
+        [✔] Favorites
+            [✔] Insert (like)
+            [✔] Delete (dislike)
+            [✔] Stay on category page after like/dislike
+            [✔] main page show like ffs
+            [X] See all favorites
         [ ] Items more(?)
             [ ] Sort alphabetical
             [ ] Sort cost
-        [ ] Buying
-            [ ] Add to cart
-            [ ] Payment (?)
-            [ ] Stock control
+            [ ] Description column
+        [⏳] Buying
+            [⏳] Add to cart - PUT /cart/
+            [ ] Check out / Payment - POST /cart/checkout/    + Stock control
         [ ] Shoppingcart/box
-            [ ] See past transactions
-            [ ] Bill
+            [ ] See past transactions - GET /cart/history/
+            [ ] See current cart - GET /cart/
+            [ ] Delete item from cart - DELETE /cart/<item_id>/
+            [X] Bill (Created after transaction)
         [ ] Admin
             [ ] Add new item
             [ ] Delete item
@@ -63,9 +69,18 @@ csrf.init_app(app)
             [ ] See all favorites
             [ ] See all shopping carts
             [ ] See all users
+        [ ] Stay logged in
         [ ] Searchbox
             
 """
+
+@app.route("/cart/", methods=['GET', 'POST'])
+def cart(user_id):
+    if request.method == 'GET':
+        return render_template('cart.html')
+    elif request.method == 'POST':
+        # add to cart
+        pass
 
 @app.route("/favourites/<product_id>")
 def add_shopbox(product_id):
@@ -85,10 +100,10 @@ def add_shopbox(product_id):
             return redirect(url_for('home'))
 
 
-@app.route("/favourites/<product_id>")
+@app.route("/favourites/<product_id>", methods=['GET'])
 def add_favs(product_id):
     # check if user logged in first
-    print("SUCCES ON CALLING METHODs")
+    print("SUCCESS ON CALLING METHODs")
     if 'logged_in' not in session or session['logged_in'] != True:
         return redirect(url_for('login', msg="Please first log in"))
     else:
@@ -97,12 +112,53 @@ def add_favs(product_id):
         if not (customer_id is None):
             fav_box_obj = FavBox()
             fav_box_obj.addItemToFavBox(customer_id=customer_id, product_id=product_id)
-            flash('The item successgully added to your favs!', 'success')
+            flash('The item successfully added to your favs!', 'success')
             return redirect(url_for('home'))
         else:
             flash('Error:', 'User is not found')
             return redirect(url_for('home'))
 
+
+@app.route("/add_to_favs/<product_id>", methods=['POST'])
+def add_to_favs(product_id):
+    # check if user logged in first
+    print("SUCCESS ON CALLING METHODs")
+    if not session.get("user_email", None):
+        return redirect(url_for('login', msg="Please first log in"))
+    else:
+        customer_obj = Customer()
+        customer_id = customer_obj.getCustomerIdByEmail(session['user_email'])
+        if not (customer_id is None):
+            fav_box_obj = FavBox()
+            fav_box_obj.addItemToFavBox(customer_id=customer_id, product_id=product_id)
+            flash('Item added to favorites!', 'success')
+
+            # return redirect(url_for('home'))
+            return redirect(request.referrer)
+        else:
+            flash('Error:', 'User is not found')
+            return redirect(url_for('home'))
+
+@app.route("/remove_from_favs/<product_id>", methods=['POST'])
+def remove_from_favs(product_id):
+    # check if user logged in first
+    print("SUCCESS ON CALLING METHODs")
+    if not session.get("user_email", None):
+        return redirect(url_for('login', msg="Please first log in"))
+    else:
+        customer_obj = Customer()
+        customer_id = customer_obj.getCustomerIdByEmail(session['user_email'])
+        if not (customer_id is None):
+            fav_box_obj = FavBox()
+            fav_box_obj.removeItemFromFavBox(customer_id=customer_id, product_id=product_id)
+            flash('Item removed to favorites!', 'success')
+            # refresh page code
+
+            # return redirect(url_for('home'))
+            return redirect(request.referrer)
+        else:
+            flash('Error:', 'User is not found')
+            return redirect(url_for('home'))
 
 @app.route("/products/<product_id>")
 def add_box(product_id):
@@ -141,13 +197,26 @@ def home(category_id=0):
     products = []
     print(category_id)
     if int(category_id) >= 1:
-        products = db_products.getCategoryProducts(category_id=int(category_id))  # get products from a certain category
-    #        print(products)
+        if session.get("customer_id", None):
+            products = db_products.getCategoryProductsWithLikes(category_id=int(category_id),
+                                                                customer_id=int(session["customer_id"]))
+        else:
+            products = db_products.getCategoryProducts(
+                category_id=int(category_id))  # get products from a certain category
+            products = list(map(lambda product: (product[0], product[1], product[2], product[3], product[4], product[5], False),
+                                products))
+            print(products)
     else:
         products = db_products.getRecords()  # get all products
+        products = list(map(lambda product: (product[0], product[1], product[2], product[3], product[4], product[5], False),
+                            products))
+
     #       print(products)
 
-    shuffle(products)
+    # sort the products
+    # products = sorted(products, key=lambda x: x[6], reverse=True)
+
+    # shuffle(products)
     return render_template("index.html", image_url=image_url,
                            categories=categories,
                            products=products)
@@ -175,6 +244,7 @@ def login():
             customer = customer_obj.getCustomerByEmail(email=email)
             session['logged_in'] = True
             session['user_email'] = email
+            session['customer_id'] = customer[4]
             print("THIS IS YOUR EMAIL")
             print(session['user_email'])
             print(email)
@@ -241,6 +311,31 @@ def update_profile():
         else:
             customer_obj.updateCustomer(customer_id, customer_dict)
             msg = "You successfully updated your profile."
+            return redirect(url_for('login', msg=msg))
+    else:
+        return "SOMETHING WENT WRONG"
+
+
+# Delete user account code. Log out the user after deleting the profile.
+@app.route('/login/delete_user', methods=["GET", "POST"])
+def delete_user():
+    deleteUserForm = DeleteUserForm()
+    if request.method == 'GET':
+        customer_obj = Customer()
+        customer = customer_obj.getCustomerByEmail(email=session['user_email'])
+        return render_template('delete_user.html', customer=customer, form=deleteUserForm)
+    elif request.method == 'POST' and deleteUserForm.validate_on_submit():
+        customer_obj = Customer()
+        customer_id = customer_obj.checkCustomerExistByPhone(customer_phone=deleteUserForm.phone.data)
+        if customer_id is None:
+            msg = "You are not registered yet, please sign up first."
+            return redirect(url_for('sign_up', msg=msg))
+        else:
+            customer_obj.deleteCustomer(customer_id)
+            session['logged_in'] = False
+            session['user_email'] = None
+            session['customer_id'] = None
+            msg = "You successfully deleted your profile."
             return redirect(url_for('login', msg=msg))
     else:
         return "SOMETHING WENT WRONG"

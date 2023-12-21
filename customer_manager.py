@@ -16,6 +16,14 @@ class FavBox(DatabaseManagement):
 
             connection.commit()
 
+    def removeItemFromFavBox(self, customer_id: int, product_id: int):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                query = f"DELETE FROM {self.table_name} WHERE customer_id = %s AND product_id = %s"
+                cur.execute(query, (customer_id, product_id))
+
+            connection.commit()
+
     def getItems(self, customer_id):
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:
@@ -145,7 +153,7 @@ class Customer(DatabaseManagement):
     def getCustomerByEmail(self, email):
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:
-                query = f"select customer_name, customer_phone, customer_address, customer_email from {self.table_name} where customer_email = %s"
+                query = f"select customer_name, customer_phone, customer_address, customer_email, customer_id from {self.table_name} where customer_email = %s"
                 cur.execute(query, (email,))
                 customer = cur.fetchone()
                 return customer
@@ -173,6 +181,12 @@ class Customer(DatabaseManagement):
                                     customer_dict['email'], customer_id))
             connection.commit()
 
+    def deleteCustomer(self, customer_id):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                query = f"""DELETE FROM {self.table_name} WHERE customer_id = %s"""
+                cur.execute(query, (customer_id,))
+            connection.commit()
 
 
     # def getCustomerIdByEmail(self, email):
@@ -188,3 +202,4 @@ class Customer(DatabaseManagement):
     #                 return True
     #             else:
     #                 return False
+

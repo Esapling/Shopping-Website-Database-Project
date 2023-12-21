@@ -38,21 +38,34 @@ csrf.init_app(app)
             [✔] Insert (like)
             [✔] Delete (dislike)
             [✔] Stay on category page after like/dislike
-            [⏳] Main page   (like/dislike buttons)
-            [X] See all favorites
-        [⏳] Items more(?)
-            [ ] Sort alphabetical
-            [ ] Sort cost
-            [ ] Description column
+            [⏳] Main page (like/dislike buttons)
+            [?] See only favorites
+        [⏳] Items 
+            [⏳] Sort alphabetical
+            [⏳] Sort by cost
+            [ ] Add description column
+            [ ] Scrape data for other categories
+            [ ] More data (?)
         [⏳] Buying
             [✔] Add to cart - PUT /cart/
             [⏳] Check out / Payment - POST /cart/checkout/    + Stock control
         [ ] Shoppingcart/box
-            [ ] See past transactions - GET /cart/history/
             [✔] See current cart - GET /cart/
             [ ] Delete item from cart - DELETE /cart/<item_id>/
+            [?] See past transactions - GET /cart/history/
             [X] Bill (Created after transaction)
-            [ ] Annoying widgets
+            [ ] What is lira button for?
+        [ ] Stay logged in
+            [ ] And don't show log tab when logged in
+        [👀] Webpage design
+            [ ] Add logo
+            [ ] Add site name (remove database title)
+            [ ] Make products not demo-like (fix descriptions) 
+            [ ] Update footer information
+        [X] Stores
+            [ ] Add products but from new store
+            [ ] Implement stocking by store
+            [ ] See all stores
         [X] Admin
             [ ] Add new item
             [ ] Delete item
@@ -70,8 +83,6 @@ csrf.init_app(app)
             [ ] See all favorites
             [ ] See all shopping carts
             [ ] See all users
-        [ ] Stay logged in
-            [ ] And don't show log in when logged in
         [X] Searchbox
             
 """

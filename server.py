@@ -38,21 +38,22 @@ csrf.init_app(app)
             [✔] Insert (like)
             [✔] Delete (dislike)
             [✔] Stay on category page after like/dislike
-            [✔] main page show like ffs
+            [⏳] Main page   (like/dislike buttons)
             [X] See all favorites
-        [ ] Items more(?)
+        [⏳] Items more(?)
             [ ] Sort alphabetical
             [ ] Sort cost
             [ ] Description column
         [⏳] Buying
-            [⏳] Add to cart - PUT /cart/
-            [ ] Check out / Payment - POST /cart/checkout/    + Stock control
+            [✔] Add to cart - PUT /cart/
+            [⏳] Check out / Payment - POST /cart/checkout/    + Stock control
         [ ] Shoppingcart/box
             [ ] See past transactions - GET /cart/history/
-            [ ] See current cart - GET /cart/
+            [✔] See current cart - GET /cart/
             [ ] Delete item from cart - DELETE /cart/<item_id>/
             [X] Bill (Created after transaction)
-        [ ] Admin
+            [ ] Annoying widgets
+        [X] Admin
             [ ] Add new item
             [ ] Delete item
             [ ] Update item
@@ -70,17 +71,38 @@ csrf.init_app(app)
             [ ] See all shopping carts
             [ ] See all users
         [ ] Stay logged in
-        [ ] Searchbox
+            [ ] And don't show log in when logged in
+        [X] Searchbox
             
 """
 
+
 @app.route("/cart/", methods=['GET', 'POST'])
-def cart(user_id):
-    if request.method == 'GET':
-        return render_template('cart.html')
-    elif request.method == 'POST':
-        # add to cart
-        pass
+def cart():
+    if 'logged_in' not in session or session['logged_in'] != True:
+        return redirect(url_for('login', msg="Please first log in"))
+    else:
+        customer_obj = Customer()
+        customer_id = customer_obj.getCustomerIdByEmail(session['user_email'])
+        if request.method == 'GET':
+            if customer_id is not None:
+                # get cart items
+                products = customer_obj.getCartItems(customer_id)
+                return render_template('cart.html', products=products)
+            else:
+                flash('Error:', 'User is not found')
+                return redirect(url_for('home'))
+        elif request.method == 'POST':
+            # add to cart
+            product_id = request.form.get("product_id", None)
+            if customer_id is not None:
+                customer_obj.addItemToCart(customer_id=customer_id, product_id=product_id)
+                flash('Item successfully added to cart!', 'success')
+                return redirect(request.referrer)
+            else:
+                flash('Error:', 'User is not found')
+                return redirect(url_for('home'))
+
 
 @app.route("/favourites/<product_id>")
 def add_shopbox(product_id):
@@ -139,6 +161,7 @@ def add_to_favs(product_id):
             flash('Error:', 'User is not found')
             return redirect(url_for('home'))
 
+
 @app.route("/remove_from_favs/<product_id>", methods=['POST'])
 def remove_from_favs(product_id):
     # check if user logged in first
@@ -151,7 +174,7 @@ def remove_from_favs(product_id):
         if not (customer_id is None):
             fav_box_obj = FavBox()
             fav_box_obj.removeItemFromFavBox(customer_id=customer_id, product_id=product_id)
-            flash('Item removed to favorites!', 'success')
+            flash('Item removed from favorites!', 'success')
             # refresh page code
 
             # return redirect(url_for('home'))
@@ -159,6 +182,7 @@ def remove_from_favs(product_id):
         else:
             flash('Error:', 'User is not found')
             return redirect(url_for('home'))
+
 
 @app.route("/products/<product_id>")
 def add_box(product_id):
@@ -203,13 +227,15 @@ def home(category_id=0):
         else:
             products = db_products.getCategoryProducts(
                 category_id=int(category_id))  # get products from a certain category
-            products = list(map(lambda product: (product[0], product[1], product[2], product[3], product[4], product[5], False),
-                                products))
+            products = list(
+                map(lambda product: (product[0], product[1], product[2], product[3], product[4], product[5], False),
+                    products))
             print(products)
     else:
         products = db_products.getRecords()  # get all products
-        products = list(map(lambda product: (product[0], product[1], product[2], product[3], product[4], product[5], False),
-                            products))
+        products = list(
+            map(lambda product: (product[0], product[1], product[2], product[3], product[4], product[5], False),
+                products))
 
     #       print(products)
 

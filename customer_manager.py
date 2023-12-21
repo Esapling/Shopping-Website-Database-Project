@@ -127,6 +127,22 @@ class Customer(DatabaseManagement):
                 else:
                     return customer[0]  # customer tuple object[0] - id value
 
+    def getCartItems(self, customer_id):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                query = f"SELECT p.* from customer_shop_box csb left join" \
+                        f" product p on csb.product_id = p.product_id where csb.customer_id = %s"
+                cur.execute(query, (customer_id,))
+                products = cur.fetchall()
+        return products
+
+    def addItemToCart(self, customer_id, product_id):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                query = f"INSERT INTO customer_shop_box (customer_id, product_id) VALUES (%s, %s)"
+                cur.execute(query, (customer_id, product_id))
+            connection.commit()
+
     # login
     def validataCustomerRegistered(self, email_addr, password):
         """

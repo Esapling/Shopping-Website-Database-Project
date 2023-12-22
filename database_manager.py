@@ -11,16 +11,16 @@ class DatabaseManagement:
         self.set_initials(table_name)
 
     def set_initials(self, table_name):
-        self.dbname = os.environ['DB_NAME']  # 'shopping_website'  #
+        self.dbname = os.environ['DB_NAME']  #
         self.db_params = {
             "dbname": self.dbname,
-            "user": os.environ['DB_USERNAME'],  # 'postgres',  #
-            "password": os.environ['DB_PASS']  
+            "user": os.environ['DB_USERNAME'],  #
+            "password": os.environ['DB_PASS']  #
         }
 
         self.table_name = table_name
 
-    def exectue_sqlscript(self, sql_file_path):
+    def execute_sqlscript(self, sql_file_path):
         with open(file=sql_file_path, mode="r") as sqlfile:
             sql_script_commands = sqlfile.read()
             print(sql_script_commands)
@@ -60,24 +60,24 @@ class DatabaseManagement:
 if __name__ == "__main__":
     db = DatabaseManagement("customer")
 
-    # db.exectue_sqlscript("instances/is_registered_flag_trigger.sql")
-    # db.exectue_sqlscript("instances/inventory_provider.sql")
+    # db.execute_sqlscript("instances/is_registered_flag_trigger.sql")
+    # db.execute_sqlscript("instances/inventory_provider.sql")
 
-    # db.exectue_sqlscript("instances/store.sql")
-    # db.exectue_sqlscript("instances/categories.sql")
-    # db.exectue_sqlscript("instances/customer.sql")
-    # db.exectue_sqlscript("instances/products.sql")
-    # db.exectue_sqlscript("instances/order.sql")
-    # db.exectue_sqlscript("instances/order_junction.sql")
-    # db.exectue_sqlscript("instances/category_trigger.sql")
-    # db.exectue_sqlscript("instances/price_trigger_delete.sql")
-    # db.exectue_sqlscript("instances/price_trigger_insert.sql")
+    # db.execute_sqlscript("instances/store.sql")
+    # db.execute_sqlscript("instances/categories.sql")
+    # db.execute_sqlscript("instances/customer.sql")
+    # db.execute_sqlscript("instances/products.sql")
+    # db.execute_sqlscript("instances/order.sql")
+    # db.execute_sqlscript("instances/order_junction.sql")
+    # db.execute_sqlscript("instances/category_trigger.sql")
+    # db.execute_sqlscript("instances/price_trigger_delete.sql")
+    # db.execute_sqlscript("instances/price_trigger_insert.sql")
 
-    # db.exectue_sqlscript("instances/shop_box.sql")
-    # db.exectue_sqlscript("instances/fav_box.sql")
+    # db.execute_sqlscript("instances/shop_box.sql")
+    # db.execute_sqlscript("instances/fav_box.sql")
 
     # db = DatabaseManagement("customer")
     #
-    # db.exectue_sqlscript("instances/price_trigger.sql")
+    # db.execute_sqlscript("instances/price_trigger.sql")
     # x = db.getById(4)
     # print(x)

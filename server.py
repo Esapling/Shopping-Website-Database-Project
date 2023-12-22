@@ -43,7 +43,7 @@ csrf.init_app(app)
             [✔] Delete (dislike)
             [✔] Stay on category page after like/dislike
             [~] Main page (like/dislike buttons)
-            [?] See only favorites
+            [?] See only favorites --> getCategoryProductsWithLikes??
         [⏳] Items 
             [⏳] FIXME: Why is getCategoryProductsWithLikes called and not getCategoryProducts?
                         Also getCategoryProductsWithLikes is not working properly.
@@ -56,6 +56,7 @@ csrf.init_app(app)
             [✔] Add to cart - PUT /cart/
             [~] Remove from cart - DELETE /cart/
             [⏳] Check out / Payment - POST /cart/checkout/    + Stock control
+            [?] Bill class
         [ ] Shoppingcart/box
             [✔] See current cart - GET /cart/
             [~] Delete item from cart - DELETE /cart/<item_id>/
@@ -97,6 +98,9 @@ csrf.init_app(app)
 """
 
 
+################################################################################################
+#                                             Cart                                             #
+################################################################################################
 @app.route("/cart/", methods=['GET', 'POST'])
 def cart():
     if 'logged_in' not in session or session['logged_in'] is not True:
@@ -124,6 +128,34 @@ def cart():
                 return redirect(url_for('home'))
 
 
+# Checkout function. Create a bill and then delete the cart items of user.
+@app.route("/cart/checkout/", methods=['POST'])
+def checkout():
+    if 'logged_in' not in session or session['logged_in'] is not True:
+        return redirect(url_for('login', msg="Please first log in"))
+    else:
+        customer_obj = Customer()
+        customer_id = customer_obj.getCustomerIdByEmail(session['user_email'])
+        if request.method == 'POST':
+            if customer_id is not None:
+                # Get cart items
+                products = customer_obj.getCartItems(customer_id)
+                # Create bill
+                # TODO: Create bill class and add bill to database
+                #   Compute total cost and check stock, if stock is not enough, do not proceed
+                #   Do mock transaction and create bill. Add bill to database
+                # Delete cart items
+                customer_obj.emptyCart(customer_id)
+                # TODO: Where should we redirect after checkout?
+                return render_template('cart.html', products=products)
+            else:
+                flash('Error:', 'User is not found')
+                return redirect(url_for('home'))
+        else:
+            return "INVALID REQUEST"
+
+
+"""
 @app.route("/favourites/<product_id>")
 def add_shopbox(product_id):
     # check if user logged in first
@@ -141,8 +173,6 @@ def add_shopbox(product_id):
             flash('Error:', 'User is not found')
             return redirect(url_for('home'))
 
-
-"""
 @app.route("/favourites/<product_id>", methods=['GET'])
 def add_favs(product_id):
     # check if user logged in first
@@ -162,6 +192,10 @@ def add_favs(product_id):
             return redirect(url_for('home'))
 """
 
+
+################################################################################################
+#                                          Favorites                                           #
+################################################################################################
 
 @app.route("/add_to_favs/<product_id>", methods=['POST'])
 def add_to_favs(product_id):
@@ -231,6 +265,10 @@ def show_box(user_id):
     pass
 
 
+################################################################################################
+#                                     Home (Products) Page                                     #
+################################################################################################
+
 @app.route("/")
 @app.route("/<category_id>")
 def home(category_id=0):
@@ -271,6 +309,9 @@ def home(category_id=0):
                            products=products)
 
 
+################################################################################################
+#                                         Login/Signup                                         #
+################################################################################################
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     login_form = LoginForm()
@@ -336,6 +377,10 @@ def sign_up(msg=None):
     else:
         return "SOMETHING WENT WRONG"
 
+
+################################################################################################
+#                                       Account Editing                                        #
+################################################################################################
 
 # Update user profile code. For empty fields, it will keep the old values.
 @app.route('/login/update_profile', methods=["GET", "POST"])

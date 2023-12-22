@@ -143,6 +143,13 @@ class Customer(DatabaseManagement):
                 cur.execute(query, (customer_id, product_id))
             connection.commit()
 
+    def emptyCart(self, customer_id):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                query = f"DELETE FROM customer_shop_box WHERE customer_id = %s"
+                cur.execute(query, (customer_id,))
+            connection.commit()
+
     # login
     def validataCustomerRegistered(self, email_addr, password):
         """
@@ -203,6 +210,7 @@ class Customer(DatabaseManagement):
                 query = f"""DELETE FROM {self.table_name} WHERE customer_id = %s"""
                 cur.execute(query, (customer_id,))
             connection.commit()
+            print('G\'bye world')
 
 
     # def getCustomerIdByEmail(self, email):
@@ -218,4 +226,6 @@ class Customer(DatabaseManagement):
     #                 return True
     #             else:
     #                 return False
+
+
 

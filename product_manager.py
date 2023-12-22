@@ -20,7 +20,9 @@ class Product(DatabaseManagement):
     def getCategoryProductsWithLikes(self, category_id: int, customer_id: int):
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:
-                # select all products in the category with computed field "liked" which is true if the product is in the customer's fav boxes
+                # select all products in the category with computed field "liked"
+                # which is true if the product is in the customer's fav boxes
+                # FIXME: Does this query work? --> All products are called
                 query_junction = f"select product.*, case when product.product_id in " \
                                  f"(select product_id from customer_fav_boxes where customer_id=%s) " \
                                  f"then true else false end as liked from product where category_id=%s"

@@ -36,15 +36,17 @@ csrf.init_app(app)
             [✔] Delete  
             [~] Warn user before delete
             [~] Logout (delete session)
-            [⏳] Get access to user page from main page
+            [~] Get access to user page from main page
             [ ] Stay logged in --> do not show login page everytime pls
         [✔] Favorites
             [✔] Insert (like)
             [✔] Delete (dislike)
             [✔] Stay on category page after like/dislike
-            [⏳] Main page (like/dislike buttons)
+            [~] Main page (like/dislike buttons)
             [?] See only favorites
         [⏳] Items 
+            [⏳] FIXME: Why is getCategoryProductsWithLikes called and not getCategoryProducts?
+                        Also getCategoryProductsWithLikes is not working properly.
             [⏳] Sort alphabetical
             [⏳] Sort by cost
             [ ] Add description column
@@ -52,6 +54,7 @@ csrf.init_app(app)
             [ ] More data (?)
         [⏳] Buying
             [✔] Add to cart - PUT /cart/
+            [~] Remove from cart - DELETE /cart/
             [⏳] Check out / Payment - POST /cart/checkout/    + Stock control
         [ ] Shoppingcart/box
             [✔] See current cart - GET /cart/
@@ -241,6 +244,7 @@ def home(category_id=0):
     print(category_id)
     if int(category_id) >= 1:
         if session.get("customer_id", None):
+            # FIXME: This case is incorrectly placed and does not work, needs fixing
             products = db_products.getCategoryProductsWithLikes(category_id=int(category_id),
                                                                 customer_id=int(session["customer_id"]))
         else:

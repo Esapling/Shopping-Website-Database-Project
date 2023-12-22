@@ -42,29 +42,36 @@
           <p class="value-info">{{customer[0]}}</p>
         </div>
         <div class="info-item">
-          <h3 class="title-info">Phone</h3>
-          <p class="value-info">{{customer[1]}}</p>
-        </div>
-        <div class="info-item">
-          <h3 class="title-info">Email</h3>
-          <p class="value-info">{{email}}</p>
+          <h3 class="title-info">Address</h3>
+          <p class="value-info">{{customer[2]}}</p>
         </div>
       </div>
       <div class="info-col">
         <div class="info-item">
-          <h3 class="title-info">Address</h3>
-          <p class="value-info">{{customer[2]}}</p>
+          <h3 class="title-info">Email</h3>
+          <p class="value-info">{{email}}</p>
         </div>
         <div class="info-item">
-          <button class="btn btn-outline-success" type="submit">See Shop History</button>
+          <h3 class="title-info">Phone</h3>
+          <p class="value-info">{{customer[1]}}</p>
         </div>
+      </div>
+      <div class="info-col">
         <div class="info-item">
           <a href="{{url_for('update_profile')}}">
             <button class="btn btn-outline-success" type="submit">Update Profile</button>
           </a>
         </div>
-
+        <div class="info-item">
+          <a href="{{url_for('logout')}}">
+            <button class="btn btn-outline-success" type="submit">Log out</button>
+          </a>
+        </div>
       </div>
+      <div class="info-item">
+        <button class="btn btn-outline-success" type="submit">See Shop History</button>
+      </div>
+
     </div>
   </div>
 </section>

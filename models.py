@@ -32,6 +32,3 @@ class UpdateProfileForm(FlaskForm):
                           render_kw={"class": "input-field"})
     submit = SubmitField("submit", render_kw={"class": "submit-field"})
 
-
-class DeleteUserForm(FlaskForm):
-    submit = SubmitField("submit", render_kw={"class": "submit-field"})

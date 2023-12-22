@@ -4,7 +4,7 @@ from flask_bootstrap import Bootstrap5
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect
 
-from models import LoginForm, SignUpForm, UpdateProfileForm, DeleteUserForm
+from models import LoginForm, SignUpForm, UpdateProfileForm
 import os
 from database_manager import DatabaseManagement
 from category_manager import Category
@@ -33,7 +33,11 @@ csrf.init_app(app)
     TODO:
         [⏳] User Profile
             [✔] Update
-            [⏳] Delete  (warn user before delete)
+            [✔] Delete  
+            [~] Warn user before delete
+            [~] Logout (delete session)
+            [⏳] Get access to user page from main page
+            [ ] Stay logged in --> do not show login page everytime pls
         [✔] Favorites
             [✔] Insert (like)
             [✔] Delete (dislike)
@@ -51,16 +55,18 @@ csrf.init_app(app)
             [⏳] Check out / Payment - POST /cart/checkout/    + Stock control
         [ ] Shoppingcart/box
             [✔] See current cart - GET /cart/
-            [ ] Delete item from cart - DELETE /cart/<item_id>/
+            [~] Delete item from cart - DELETE /cart/<item_id>/
             [?] See past transactions - GET /cart/history/
-            [X] Bill (Created after transaction)
+            [X?] Bill (Created after transaction)
             [ ] What is lira button for?
         [ ] Stay logged in
             [ ] And don't show log tab when logged in
         [👀] Webpage design
             [ ] Add logo
-            [ ] Add site name (remove database title)
-            [ ] Make products not demo-like (fix descriptions) 
+            [✔] Add site name (remove database title)
+            [ ] Replace login with user profile page
+            [ ] Make products not demo-like (fix descriptions)
+            [ ] At signup page leave page button needed 
             [ ] Update footer information
         [X] Stores
             [ ] Add products but from new store
@@ -83,14 +89,14 @@ csrf.init_app(app)
             [ ] See all favorites
             [ ] See all shopping carts
             [ ] See all users
-        [X] Searchbox
+        [X] Searchbar
             
 """
 
 
 @app.route("/cart/", methods=['GET', 'POST'])
 def cart():
-    if 'logged_in' not in session or session['logged_in'] != True:
+    if 'logged_in' not in session or session['logged_in'] is not True:
         return redirect(url_for('login', msg="Please first log in"))
     else:
         customer_obj = Customer()
@@ -133,11 +139,12 @@ def add_shopbox(product_id):
             return redirect(url_for('home'))
 
 
+"""
 @app.route("/favourites/<product_id>", methods=['GET'])
 def add_favs(product_id):
     # check if user logged in first
     print("SUCCESS ON CALLING METHODs")
-    if 'logged_in' not in session or session['logged_in'] != True:
+    if 'logged_in' not in session or session['logged_in'] is not True:
         return redirect(url_for('login', msg="Please first log in"))
     else:
         customer_obj = Customer()
@@ -150,6 +157,7 @@ def add_favs(product_id):
         else:
             flash('Error:', 'User is not found')
             return redirect(url_for('home'))
+"""
 
 
 @app.route("/add_to_favs/<product_id>", methods=['POST'])
@@ -340,42 +348,43 @@ def update_profile():
             "address": updateProfileForm.address.data,
             "email": updateProfileForm.email.data
         }
-        customer_obj = Customer()
-        customer_id = customer_obj.checkCustomerExistByPhone(customer_phone=customer_dict['phone'])
-        if customer_id is None:
-            msg = "You are not registered yet, please sign up first."
-            return redirect(url_for('sign_up', msg=msg))
+        if 'logged_in' not in session or session['logged_in'] is not True:
+            return redirect(url_for('login', msg="Please first log in"))
         else:
-            customer_obj.updateCustomer(customer_id, customer_dict)
-            msg = "You successfully updated your profile."
-            return redirect(url_for('login', msg=msg))
+            customer_obj = Customer()
+            # FIXME: debug if user changes email will this work
+            customer_id = customer_obj.getCustomerIdByEmail(session['user_email'])
+            if customer_id is None:
+                msg = "You are not registered yet, please sign up first."
+                return redirect(url_for('sign_up', msg=msg))
+            else:
+                customer_obj.updateCustomer(customer_id, customer_dict)
+                msg = "You successfully updated your profile."
+                # TODO: is there need to update session values?
+                # FIXME: Redirect to user profile page or main page?
+                return redirect(url_for('login', msg=msg))
     else:
         return "SOMETHING WENT WRONG"
 
 
-# Delete user account code. Log out the user after deleting the profile.
-@app.route('/login/delete_user', methods=["GET", "POST"])
-def delete_user():
-    deleteUserForm = DeleteUserForm()
-    if request.method == 'GET':
-        customer_obj = Customer()
-        customer = customer_obj.getCustomerByEmail(email=session['user_email'])
-        return render_template('delete_user.html', customer=customer, form=deleteUserForm)
-    elif request.method == 'POST' and deleteUserForm.validate_on_submit():
-        customer_obj = Customer()
-        customer_id = customer_obj.checkCustomerExistByPhone(customer_phone=deleteUserForm.phone.data)
-        if customer_id is None:
-            msg = "You are not registered yet, please sign up first."
-            return redirect(url_for('sign_up', msg=msg))
-        else:
-            customer_obj.deleteCustomer(customer_id)
-            session['logged_in'] = False
-            session['user_email'] = None
-            session['customer_id'] = None
-            msg = "You successfully deleted your profile."
-            return redirect(url_for('login', msg=msg))
+# Delete user account code. Log out the user after deleting the profile. # WIP
+@app.route('/login/delete_user/<customer_id>', methods=["POST"])
+def delete_user(customer_id):
+    customer_obj = Customer()
+    # customer_id = customer_obj.getCustomerIdByEmail(customer_email)
+    if not session.get("user_email", None):
+        return redirect(url_for('login', msg="Please first log in"))
+    elif customer_id is None:
+        msg = "You are not registered yet, please sign up first."
+        return redirect(url_for('sign_up', msg=msg))
     else:
-        return "SOMETHING WENT WRONG"
+        customer_obj.deleteCustomer(customer_id)
+        session['logged_in'] = False
+        session['user_email'] = None
+        session['customer_id'] = None
+        msg = "You successfully deleted your profile."
+        # flash(msg, 'success')
+        return redirect(url_for('login', msg=msg))
 
 
 if __name__ == "__main__":

@@ -53,6 +53,25 @@ class ShopBox(DatabaseManagement):
         return products
 
 
+class Order(DatabaseManagement):
+    def __init__(self) -> None:
+        super().__init__(table_name="CUSTOMER_ORDERS")
+
+    def addOrder(self, customer_id: int, product_id: int):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                query = f"INSERT INTO {self.table_name} (customer_id, product_id) VALUES (%s, %s)"
+                cur.execute(query, (customer_id, product_id))
+            connection.commit()
+
+    def getItems(self, customer_id):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                query = f"SELECT product_id from {self.table_name} where customer_id = %s"
+                cur.execute(query, (customer_id,))
+                products = cur.fetchall()
+        return products
+
 class Customer(DatabaseManagement):
     def __init__(self) -> None:
         super().__init__(table_name="customer")

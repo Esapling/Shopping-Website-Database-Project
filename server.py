@@ -30,19 +30,28 @@ csrf.init_app(app)
 # separate relative methods in diff modules with classes
 
 """ 
+    ✔ : DONE
+    ⏳ : WIP
+    ~ : WIP in future
+    ' ' : TODO
+    ? : Not sure
+    👀 : Flavor
+    X : SKIPPED
     TODO:
         [⏳] User Profile
             [✔] Update
             [✔] Delete  
-            [~] Warn user before delete
+            [👀] Warn user before deletion
             [~] Logout (delete session)
             [~] Get access to user page from main page
-            [ ] Stay logged in --> do not show login page everytime pls
+            [ ] Stay logged in --> do not show login tab when logged in, show user profile tab
+                <<<User tab and login tab should be different>>>
+            [?] See past transactions - GET /login/<customer_id>/transactions/
         [✔] Favorites
             [✔] Insert (like)
             [✔] Delete (dislike)
             [✔] Stay on category page after like/dislike
-            [~] Main page (like/dislike buttons)
+            [👀] Main page (like/dislike button coloring)
             [?] See only favorites --> getCategoryProductsWithLikes??
         [⏳] Items 
             [⏳] FIXME: Why is getCategoryProductsWithLikes called and not getCategoryProducts?
@@ -52,19 +61,16 @@ csrf.init_app(app)
             [ ] Add description column
             [ ] Scrape data for other categories
             [ ] More data (?)
-        [⏳] Buying
-            [✔] Add to cart - PUT /cart/
-            [~] Remove from cart - DELETE /cart/
+        [⏳] Purchase      
             [⏳] Check out / Payment - POST /cart/checkout/    + Stock control
-            [?] Bill class
-        [ ] Shoppingcart/box
+            [👀] Mock transaction
+            [X?] Bill class --> Create bill after transaction and add to database
+        [⏳] Shoppingcart/box
+            [✔] Add to cart - PUT /cart/
             [✔] See current cart - GET /cart/
-            [~] Delete item from cart - DELETE /cart/<item_id>/
-            [?] See past transactions - GET /cart/history/
-            [X?] Bill (Created after transaction)
+            [~] Remove item from cart - DELETE /cart/<item_id>/
+            [⏳] Purchase    - POST /cart/checkout/
             [ ] What is lira button for?
-        [ ] Stay logged in
-            [ ] And don't show log tab when logged in
         [👀] Webpage design
             [ ] Add logo
             [✔] Add site name (remove database title)
@@ -72,11 +78,14 @@ csrf.init_app(app)
             [ ] Make products not demo-like (fix descriptions)
             [ ] At signup page leave page button needed 
             [ ] Update footer information
+            [?] Product individual pages
         [X] Stores
             [ ] Add products but from new store
             [ ] Implement stocking by store
             [ ] See all stores
-        [X] Admin
+            [ ] See all products in a store
+            [ ] Store users?
+        [X] Admin/Employees
             [ ] Add new item
             [ ] Delete item
             [ ] Update item
@@ -86,6 +95,17 @@ csrf.init_app(app)
             [ ] Add new user
             [ ] Delete user
             [ ] Update user
+            [ ] Add new store
+            [ ] Delete store
+            [ ] Update store
+            [X] Add new transaction
+            [X] Delete transaction
+            [X] Update transaction
+            [X] Add new shopping cart
+            [X] Delete shopping cart
+            [X] Update shopping cart
+            [X] Add new favorite
+            [X] Delete favorite
             [ ] See all transactions
             [ ] See all users
             [ ] See all items
@@ -129,13 +149,13 @@ def cart():
 
 
 # Checkout function. Create a bill and then delete the cart items of user.
-@app.route("/cart/checkout/", methods=['POST'])
-def checkout():
+@app.route("/cart/checkout/<customer_id>", methods=['POST'])
+def checkout(customer_id=None):
     if 'logged_in' not in session or session['logged_in'] is not True:
         return redirect(url_for('login', msg="Please first log in"))
     else:
         customer_obj = Customer()
-        customer_id = customer_obj.getCustomerIdByEmail(session['user_email'])
+        # customer_id = customer_obj.getCustomerIdByEmail(session['user_email'])
         if request.method == 'POST':
             if customer_id is not None:
                 # Get cart items
@@ -244,24 +264,20 @@ def remove_from_favs(product_id):
 def add_box(product_id):
     return "THERE YOU GO"
 
+@app.route("/box/<user_id>")
+def show_box(user_id):
+    pass
 
 @app.route("/welcome")
 def register_user():
     pass
 
-
 @app.route("/users/<user_id>")
 def update_registered_user():
     pass
 
-
 @app.route("/products/<product_id>")
 def product_page(product_id):
-    pass
-
-
-@app.route("/box/<user_id>")
-def show_box(user_id):
     pass
 
 

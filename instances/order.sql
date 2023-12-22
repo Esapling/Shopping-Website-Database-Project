@@ -10,7 +10,7 @@ CREATE TABLE PURCHASE_ORDER(
 );
 -- while adding a new customer first add the customer to the related table 
 -- then add the order info 
--- consider possible errror , for that need a trigger to check if the given customer exists
+-- consider possible error, for that need a trigger to check if the given customer exists
 -- but customer table does not keep the registered customers
 -- it only depends of the ordered orders
--- so its natural to create (if not exists ) a record in the customer table and then in the order table
+-- so its natural to create (if not exists) a record in the customer table and then in the order table

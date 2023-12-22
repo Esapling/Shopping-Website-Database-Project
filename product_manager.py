@@ -31,6 +31,43 @@ class Product(DatabaseManagement):
                 # print(products)
                 return products
 
+
+class Category(DatabaseManagement):
+    def __init__(self) -> None:
+        super().__init__(table_name="CATEGORY")
+
+    def getCategories(self):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                query_junction = f"select * from category"
+                cur.execute(query_junction)
+                categories = cur.fetchall()
+                # print(categories)
+                return categories
+
+    def getCategoryName(self, category_id: int):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                query_junction = f"select category_name from category where category_id=%s"
+                cur.execute(query_junction, (category_id,))
+                category_name = cur.fetchone()
+                # print(category_name)
+                return category_name
+
+
+class Store(DatabaseManagement):
+    def __init__(self) -> None:
+        super().__init__(table_name="STORE")
+
+    def getStoreName(self, store_id: int):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                query_junction = f"select store_name from store where store_id=%s"
+                cur.execute(query_junction, (store_id,))
+                store_name = cur.fetchone()
+                # print(store_name)
+                return store_name
+
 # if __name__ == '__main__':
 #     db_product = Product()
 #     #db_product.exectue_sqlscript("instances/products.sql")

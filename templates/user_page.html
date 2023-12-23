@@ -6,7 +6,16 @@
 
 {%from 'bootstrap5/form.html' import render_form%}
 {%block content%}
+<script>
+  function confirmDelete() {
+      // Display a confirmation dialog
+      var confirmation = confirm("Are you sure you want to delete?");
 
+      // If user clicks OK, return true to proceed with deletion
+      // If user clicks Cancel, return false to abort the deletion
+      return confirmation;
+  }
+</script>
 
 <header class="header">
   <div class="container-navbar">
@@ -66,7 +75,7 @@
           <!--TODO: Alert and get confirmation from user.-->
           <form action="{{url_for('delete_user', customer_id=customer[-1])}}" method="post">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <button class="btn btn-outline-success" type="submit" onclick="">Delete Account</button>
+            <button class="btn btn-outline-success" type="submit" onclick="return confirmDelete()">Delete Account</button>
           </form>
         </div>
       </div>

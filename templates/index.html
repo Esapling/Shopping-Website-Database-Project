@@ -16,6 +16,19 @@
 {%endblock%} {%block title%}HOME{%endblock%}
 
  {%block content%}
+
+
+ <div class="container">
+     {% for message in get_flashed_messages() %}
+     <div class="alert alert-warning">
+         <button type="button" class="close" data-dismiss="alert">&times;</button>
+         {{ message }}
+     </div>
+     {% endfor %}
+ </div>
+ 
+
+
 <!--Header Section-->
 <header class="header">
   <div class="row">

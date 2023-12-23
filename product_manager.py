@@ -31,6 +31,14 @@ class Product(DatabaseManagement):
                 # print(products)
                 return products
 
+    def getProductsWithName(self, string):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                query = f"select * from product where product_name ILIKE %s"
+                search_string = f"%{string}%"
+                cur.execute(query, (search_string,))
+                products = cur.fetchall()
+                return products
 
 class Category(DatabaseManagement):
     def __init__(self) -> None:

@@ -31,6 +31,17 @@ class FavBox(DatabaseManagement):
                 cur.execute(query, (customer_id,))
                 products = cur.fetchall()
         return products
+    
+    def searchItem(self, customer_id: int, product_id: int):
+        x = None
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                query = f"SELECT 1 from {self.table_name} where customer_id = %s AND product_id = %s"
+                cur.execute(query, (customer_id, product_id))
+                x = cur.fetchone()
+        return x
+
+        
 
 
 class ShopBox(DatabaseManagement):

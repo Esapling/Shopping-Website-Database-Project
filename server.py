@@ -42,7 +42,7 @@ csrf.init_app(app)
             [✔] Update
             [✔] When updating, block when email or phone are already taken
             [✔] Delete  
-            [👀] Warn user before deletion
+            [✔] Warn user before deletion
             [~] Logout (delete session)
             [~] Get access to user page from main page
             [ ] Stay logged in --> do not show login tab when logged in, show user profile tab
@@ -220,7 +220,29 @@ def add_favs(product_id):
 #                                          Favorites                                           #
 ################################################################################################
 
-@app.route("/add_to_favs/<product_id>", methods=['POST'])
+# @app.route("/add_to_favs/<product_id>", methods=['POST'])
+# def favs_manage(product_id):
+#     # check if user logged in first
+#     print("SUCCESS ON CALLING METHODs")
+#     if not session.get("user_email", None):
+#         return redirect(url_for('login', msg="Please first log in"))
+#     else:
+#         customer_obj = Customer()
+#         customer_id = customer_obj.getCustomerIdByEmail(session['user_email'])
+#         if not (customer_id is None):
+#             fav_box_obj = FavBox()
+#             item_exist = fav_box_obj.searchItem(customer_id=customer_id, product_id=product_id)
+#             if item_exist != None:
+#                 return redirect(url_for('remove_from_favs', product_id=product_id))
+#             else:
+#                 return redirect(url_for('add_to_favs', product_id=product_id))
+#         else:
+#             flash('User is not found')
+#             return redirect(url_for('home'))
+      
+
+
+@app.route("/add_to_favs/<product_id>", methods=['POST', 'GET'])
 def add_to_favs(product_id):
     # check if user logged in first
     print("SUCCESS ON CALLING METHODs")
@@ -237,11 +259,13 @@ def add_to_favs(product_id):
             # return redirect(url_for('home'))
             return redirect(request.referrer)
         else:
-            flash('Error:', 'User is not found')
+            flash('User is not found')
             return redirect(url_for('home'))
 
 
-@app.route("/remove_from_favs/<product_id>", methods=['POST'])
+
+
+@app.route("/remove_from_favs/<product_id>", methods=['POST', 'GET'])
 def remove_from_favs(product_id):
     # check if user logged in first
     print("SUCCESS ON CALLING METHODs")
@@ -293,30 +317,34 @@ def product_page(product_id):
 ################################################################################################
 
 @app.route("/")
+@app.route('/search', methods=['GET'])
 @app.route("/<category_id>")
 def home(category_id=0):
     image_url = "https://dlcdnrog.asus.com/rog/media/157809658839.webp"
     # "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRITa7y1G8H3t5etxA6oyfOUO01v_YrImYpkQ&usqp=CAU"
-
-    db_category = Category()
-    categories = db_category.getRecords()  # list of tuples each tuple element is a row or record
-    db_products = Product()
+    product_obj = Product()
     products = []
-    print(category_id)
-    if int(category_id) >= 1:
+    category_obj = Category()
+    categories = category_obj.getRecords()  # list of tuples each tuple element is a row or record
+    
+    if 'search' in request.args:
+        searched_product = request.args.get('search')
+        products = product_obj.getProductsWithName(string=searched_product)
+    
+    elif int(category_id) >= 1:
         if session.get("customer_id", None):
             # FIXME: This case is incorrectly placed and does not work, needs fixing
-            products = db_products.getCategoryProductsWithLikes(category_id=int(category_id),
+            products = product_obj.getCategoryProductsWithLikes(category_id=int(category_id),
                                                                 customer_id=int(session["customer_id"]))
         else:
-            products = db_products.getCategoryProducts(
+            products = product_obj.getCategoryProducts(
                 category_id=int(category_id))  # get products from a certain category
             products = list(
                 map(lambda product: (product[0], product[1], product[2], product[3], product[4], product[5], False),
                     products))
             print(products)
     else:
-        products = db_products.getRecords()  # get all products
+        products = product_obj.getRecords()  # get all products
         products = list(
             map(lambda product: (product[0], product[1], product[2], product[3], product[4], product[5], False),
                 products))
@@ -463,24 +491,28 @@ def delete_user(customer_id):
 
 
 if __name__ == "__main__":
-    app.config.from_object("config")
-    port = app.config.get("PORT", 5000)
+    #app.config.from_object("config")
+    #port = app.config.get("PORT", 5000)
     debug = app.config.get("DEBUG")
     app.run(port=PORT, debug=DEBUG)
+
+#TODO user email vermeyince sıkıntı olusturuyor
 
 """
 @app.route("/")
 def home():
     image_url = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRITa7y1G8H3t5etxA6oyfOUO01v_YrImYpkQ&usqp=CAU"
-    db_category = Category()
-    categories = db_category.getRecords() # list of tuples each tuple element is a row or record
+    category_obj = Category()
+    categories = category_obj.getRecords() # list of tuples each tuple element is a row or record
     movie.title
     movie.year
     movie.ranking
     movie.review
     movie.description
-    categories = db_category.getRecords()
+    categories = category_obj.getRecords()
     print(categories)
     print(type(categories))
     return render_template("index.html", image_url = image_url, categories = categories)
-"""
+
+    
+    """

@@ -72,6 +72,18 @@ class Order(DatabaseManagement):
                 products = cur.fetchall()
         return products
 
+    def createOrder(self, customer_id, products):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                # TODO:
+                #   Calculate total price
+                #   How to handle the case where a product is out of stock?
+                query = f"INSERT INTO {self.table_name} (customer_id, product_id) VALUES (%s, %s)"
+                for product in products:
+                    cur.execute(query, (customer_id, product))
+            connection.commit()
+
+
 class Customer(DatabaseManagement):
     def __init__(self) -> None:
         super().__init__(table_name="customer")
@@ -217,11 +229,22 @@ class Customer(DatabaseManagement):
     def updateCustomer(self, customer_id, customer_dict):
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:
-                query = f"""UPDATE {self.table_name} SET customer_name = %s, customer_phone = %s, customer_address = %s,
-                 customer_email = %s where customer_id = %s"""
-                cur.execute(query, (customer_dict['name'], customer_dict['phone'], customer_dict['address'],
-                                    customer_dict['email'], customer_id))
-            connection.commit()
+                # Check if email or phone number is already taken
+                query = f"SELECT customer_id from {self.table_name} where customer_email = %s or customer_phone = %s"
+                cur.execute(query, (customer_dict['email'], customer_dict['phone']))
+                customer = cur.fetchone()
+                if customer is not None:
+                    # if the customer id is not the same as the given id, then it is a different customer
+                    if customer[0] != customer_id:
+                        return False
+                    # Update customer info
+                    else:
+                        query = f"""UPDATE {self.table_name} SET customer_name = %s, customer_phone = %s, customer_address = %s,
+                        customer_email = %s where customer_id = %s"""
+                        cur.execute(query, (customer_dict['name'], customer_dict['phone'], customer_dict['address'],
+                                            customer_dict['email'], customer_id))
+                        connection.commit()
+                        return True
 
     def deleteCustomer(self, customer_id):
         with psycopg.connect(**self.db_params) as connection:

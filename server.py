@@ -9,7 +9,7 @@ import os
 from database_manager import DatabaseManagement
 from category_manager import Category
 from product_manager import Product
-from customer_manager import Customer, FavBox, ShopBox
+from customer_manager import Customer, FavBox, ShopBox, Order
 from random import shuffle
 
 from config import DEBUG, PORT, username, password, database
@@ -40,6 +40,7 @@ csrf.init_app(app)
     TODO:
         [⏳] User Profile
             [✔] Update
+            [✔] When updating, block when email or phone are already taken
             [✔] Delete  
             [👀] Warn user before deletion
             [~] Logout (delete session)
@@ -70,7 +71,7 @@ csrf.init_app(app)
             [✔] See current cart - GET /cart/
             [~] Remove item from cart - DELETE /cart/<item_id>/
             [⏳] Purchase    - POST /cart/checkout/
-            [ ] What is lira button for?
+            [ ] What is lira button for? --> going to purchase page?
         [👀] Webpage design
             [ ] Add logo
             [✔] Add site name (remove database title)
@@ -82,9 +83,6 @@ csrf.init_app(app)
         [X] Stores
             [ ] Add products but from new store
             [ ] Implement stocking by store
-            [ ] See all stores
-            [ ] See all products in a store
-            [ ] Store users?
         [X] Admin/Employees
             [ ] Add new item
             [ ] Delete item
@@ -98,14 +96,6 @@ csrf.init_app(app)
             [ ] Add new store
             [ ] Delete store
             [ ] Update store
-            [X] Add new transaction
-            [X] Delete transaction
-            [X] Update transaction
-            [X] Add new shopping cart
-            [X] Delete shopping cart
-            [X] Update shopping cart
-            [X] Add new favorite
-            [X] Delete favorite
             [ ] See all transactions
             [ ] See all users
             [ ] See all items
@@ -149,23 +139,36 @@ def cart():
 
 
 # Checkout function. Create a bill and then delete the cart items of user.
-@app.route("/cart/checkout/<customer_id>", methods=['POST'])
-def checkout(customer_id=None):
+@app.route("/cart/checkout/", methods=['POST'])
+def checkout():
     if 'logged_in' not in session or session['logged_in'] is not True:
         return redirect(url_for('login', msg="Please first log in"))
     else:
         customer_obj = Customer()
-        # customer_id = customer_obj.getCustomerIdByEmail(session['user_email'])
+        customer_id = customer_obj.getCustomerIdByEmail(session['user_email'])
         if request.method == 'POST':
             if customer_id is not None:
+                customer_obj = Customer()
+                product_obj = Product()
+                order_obj = Order()
+
                 # Get cart items
                 products = customer_obj.getCartItems(customer_id)
                 # Create bill
                 # TODO: Create bill class and add bill to database
                 #   Compute total cost and check stock, if stock is not enough, do not proceed
                 #   Do mock transaction and create bill. Add bill to database
-                # Delete cart items
-                customer_obj.emptyCart(customer_id)
+
+                in_stock_arr = [product_obj.checkStock(product.product_id) for product in products]
+                # or product[-1] ??
+                # Create order for selected products
+                # Message user if stock is not enough for some products
+                # Use in_stock_arr as a mask to select only in stock products
+                # OR
+                # do everything in one big query
+                order_obj.createOrder(customer_id, products[in_stock_arr])
+                # Only delete cart items, that are in the order
+
                 # TODO: Where should we redirect after checkout?
                 return render_template('cart.html', products=products)
             else:
@@ -264,17 +267,21 @@ def remove_from_favs(product_id):
 def add_box(product_id):
     return "THERE YOU GO"
 
+
 @app.route("/box/<user_id>")
 def show_box(user_id):
     pass
+
 
 @app.route("/welcome")
 def register_user():
     pass
 
+
 @app.route("/users/<user_id>")
 def update_registered_user():
     pass
+
 
 @app.route("/products/<product_id>")
 def product_page(product_id):
@@ -417,14 +424,17 @@ def update_profile():
             return redirect(url_for('login', msg="Please first log in"))
         else:
             customer_obj = Customer()
-            # FIXME: debug if user changes email will this work
+            # TODO: debug if user changes email will this work
+            # FIXME: when email or phone are already taken, block update
             customer_id = customer_obj.getCustomerIdByEmail(session['user_email'])
             if customer_id is None:
                 msg = "You are not registered yet, please sign up first."
                 return redirect(url_for('sign_up', msg=msg))
             else:
-                customer_obj.updateCustomer(customer_id, customer_dict)
-                msg = "You successfully updated your profile."
+                if customer_obj.updateCustomer(customer_id, customer_dict):
+                    msg = "You successfully updated your profile."
+                else:
+                    msg = "User with given email or phone already exists, please try again."
                 # TODO: is there need to update session values?
                 # FIXME: Redirect to user profile page or main page?
                 return redirect(url_for('login', msg=msg))

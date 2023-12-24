@@ -31,6 +31,23 @@ IMAGE_URL = "https://dlcdnrog.asus.com/rog/media/157809658839.webp"
 temporary_items = {}  # will keep items temporarily after interval operations
 
 """ 
+    ITU BLG317E – DATABASE SYSTEMS TERM PROJECT
+    Project Name: Online Shopping Website - "E-Shop"
+        Group Members:
+            150210733 - Fatih Said Duran 
+            150200713 -  Enes Fidan 
+
+    Project Description:
+        This project is an online shopping website. 
+        It has a main page where users can see all products and filter them by category, 
+        sort them by price and name. 
+        Customers can add products to their shopping cart and purchase them, if they are in stock. 
+        They can see their past transactions through their profile page.
+        Products can also be added to their favorites. 
+        Users can register to the website and update their profile information. 
+        It is possible to even delete their account. 
+        
+    
     ✔ : DONE
     ⏳ : WIP
     ~ : WIP in future
@@ -39,19 +56,18 @@ temporary_items = {}  # will keep items temporarily after interval operations
     👀 : Flavor
     X : SKIPPED
     TODO:
-        [⏳] User Profile
-            [ ] Sign up # FIXME: Sign up page database insertion error
+        [✔] User Profile
             [✔] Login
             [✔] Update
             [✔] When updating, block when email or phone are already taken
             [✔] Delete  
             [✔] Warn user before deletion
             [~] Logout (delete session)
-            [~] Get access to user page from main page
-            [ ] Stay logged in --> do not show login tab when logged in, show user profile tab
+            [✔] Get access to user page from main page
+            [✔] Stay logged in --> do not show login tab when logged in, show user profile tab
                 <<<User tab and login tab should be different>>>
             [✔] Past transactions query
-            [⏳] See past transactions - GET /login/<customer_id>/transactions/
+            [✔] See past transactions - GET /login/<customer_id>/transactions/
             [X] While signing up address shouldn't be character limited
         [✔] Favorites
             [✔] Insert (like)
@@ -59,15 +75,15 @@ temporary_items = {}  # will keep items temporarily after interval operations
             [✔] Stay on category page after like/dislike
             [👀] Main page (like/dislike button coloring)
             [?] See only favorites --> getCategoryProductsWithLikes??
-        [⏳] Items 
-            [⏳] FIXME: Why is getCategoryProductsWithLikes called and not getCategoryProducts?
-                        Also getCategoryProductsWithLikes is not working properly.
+        [⏳] Items (Products) 
             [✔] Sort alphabetical
             [✔] Sort by cost
             [✔] Add description column
             [👀] Display description on main page
             [ ] Scrape data for other categories
             [ ] More data (?)
+            [~] FIXME: Why is getCategoryProductsWithLikes called and not getCategoryProducts?
+                        Also getCategoryProductsWithLikes is not working properly.
         [👀] Purchase      
             [✔] Check out / Payment - POST /cart/checkout/    + Stock control
             [👀] Mock transaction
@@ -77,22 +93,23 @@ temporary_items = {}  # will keep items temporarily after interval operations
             [ ] FIXME: Purchase result information message to user 
             [?] Order id to only refer to id related to customer, 
                 purchase_order table primary key would be order id + customer id
-        [⏳] Shoppingcart/box
-            [ ] FIXME: Add to cart button CSRF request must be under control
+        [[✔] FIXME: Add to cart button CSRF request must be under control] Shoppingcart/box
             [✔] Add to cart - PUT /cart/
             [✔] See current cart - GET /cart/
             [~] Remove item from cart - DELETE /cart/<item_id>/ --> Click on cart symbol to do so
             [✔] Purchase    - POST /cart/checkout/
+            [✔] FIXME: Add to cart button CSRF request must be under control
             [👀] Implement lira button for going to purchase page
         [👀] Webpage design
-            [ ] FIXME: CSRF token checks!!
+            [~] FIXME: CSRF token checks!!
             [ ] Add logo
             [✔] Add site name (remove database title)
-            [ ] Replace login with user profile page
+            [✔] Replace login with user profile page
             [ ] Make products not demo-like (fix descriptions)
             [ ] At signup page leave page button needed 
-            [ ] Update footer information
+            [~] Update footer information
             [?] Product individual pages
+        -------------Order 66 below?------------------
         [X] Stores
             [ ] Store name column required
             [ ] Add products but from new store
@@ -117,13 +134,12 @@ temporary_items = {}  # will keep items temporarily after interval operations
             [ ] See all favorites
             [ ] See all shopping carts
             [ ] See all users
-        [X] Searchbar
-            
+        [X] Searchbar    
 """
 
 
 ################################################################################################
-#                                             Purchase/Shop History                            #
+#                                    Purchase/Shop History                                     #
 ################################################################################################
 
 @app.route("/user/", methods=['GET', 'POST'])

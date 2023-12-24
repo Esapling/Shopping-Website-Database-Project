@@ -39,6 +39,8 @@ temporary_items = {}  # will keep items temporarily after interval operations
     X : SKIPPED
     TODO:
         [⏳] User Profile
+            [ ] Sign up # FIXME: Sign up page database insertion error
+            [✔] Login
             [✔] Update
             [✔] When updating, block when email or phone are already taken
             [✔] Delete  
@@ -47,6 +49,7 @@ temporary_items = {}  # will keep items temporarily after interval operations
             [~] Get access to user page from main page
             [ ] Stay logged in --> do not show login tab when logged in, show user profile tab
                 <<<User tab and login tab should be different>>>
+            [✔] Past transactions query
             [⏳] See past transactions - GET /login/<customer_id>/transactions/
             [X] While signing up address shouldn't be character limited
         [✔] Favorites
@@ -58,8 +61,8 @@ temporary_items = {}  # will keep items temporarily after interval operations
         [⏳] Items 
             [⏳] FIXME: Why is getCategoryProductsWithLikes called and not getCategoryProducts?
                         Also getCategoryProductsWithLikes is not working properly.
-            [⏳] Sort alphabetical
-            [ ] Sort by cost
+            [✔] Sort alphabetical
+            [✔] Sort by cost
             [✔] Add description column
             [👀] Display description on main page
             [ ] Scrape data for other categories

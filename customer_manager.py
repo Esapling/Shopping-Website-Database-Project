@@ -135,17 +135,22 @@ class Order(DatabaseManagement):
                          f"FROM {view_name_c} AS v GROUP BY v.product_id, v.price)")
                 cur.execute(query)
 
-                # Check if stock is available for all products in the cart
-                query = (f"SELECT SUM(s.price) from {view_name_c} s left join {view_name_p} d "
+                # Check if stock is available for all products in the cart --> supply >= demand
+                query = (f"SELECT COUNT(s.price), SUM(s.price) from {view_name_c} s left join {view_name_p} d "
                          f"on s.product_id = d.product_id where s.inventory >= d.count")
                 cur.execute(query)
+                num_in_stock, total_price = cur.fetchone()
+
+                query = f"SELECT COUNT(*) from {view_name_p} "
+                cur.execute(query)
+                num_requested = cur.fetchone()[0]
 
                 # Handle the case where a product stock is not enough
-                total_price = cur.fetchone()
                 # Stock is not available for at least one product
-                if total_price[0] is None:  # total_price[0][0] is None:
+                if num_in_stock < num_requested:  # total_price[0][0] is None:
                     # Find the products that are out of stock to inform the user
-                    query = f"SELECT csb.product_name from {view_name_c} csb where csb.inventory = 0 "
+                    query = (f"SELECT DISTINCT s.product_name from {view_name_c} s join {view_name_p} d "
+                             f"on s.product_id = d.product_id where s.inventory < d.count")
                     cur.execute(query)
                     out_of_stock_products = cur.fetchall()
                     connection.close()
@@ -160,7 +165,7 @@ class Order(DatabaseManagement):
                     # (Order state is true for now, it will be updated only after the order is delivered)
                     query = (f"INSERT INTO {self.table_name} (customer_id, order_state, total_price) "
                              f"VALUES (%s, true, %s) RETURNING order_id")
-                    cur.execute(query, (customer_id, total_price[0]))
+                    cur.execute(query, (customer_id, total_price))
 
                     # Get the last inserted ID
                     last_inserted_order_id = cur.fetchone()[0]

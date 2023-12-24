@@ -223,7 +223,6 @@ def add_favs(product_id):
 # @app.route("/add_to_favs/<product_id>", methods=['POST'])
 # def favs_manage(product_id):
 #     # check if user logged in first
-#     print("SUCCESS ON CALLING METHODs")
 #     if not session.get("user_email", None):
 #         return redirect(url_for('login', msg="Please first log in"))
 #     else:
@@ -315,22 +314,25 @@ def product_page(product_id):
 ################################################################################################
 #                                     Home (Products) Page                                     #
 ################################################################################################
-
 @app.route("/")
+@app.route("/filtered")
 @app.route('/search', methods=['GET'])
 @app.route("/<category_id>")
 def home(category_id=0):
+    #TODO :user should be able to sort products in a category as well 
+          # now this config only lets user one option amongst search, sort, retrieve from a certain category
     image_url = "https://dlcdnrog.asus.com/rog/media/157809658839.webp"
     # "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRITa7y1G8H3t5etxA6oyfOUO01v_YrImYpkQ&usqp=CAU"
     product_obj = Product()
     products = []
     category_obj = Category()
     categories = category_obj.getRecords()  # list of tuples each tuple element is a row or record
-    
-    if 'search' in request.args:
-        searched_product = request.args.get('search')
+    if "filtered" in request.args:
+        filter_opt = request.args.get('filtered')
+        products = product_obj.sortProductPrices(filter_opt)        
+    elif 'search' in request.args:
+        searched_product = request.get('search')
         products = product_obj.getProductsWithName(string=searched_product)
-    
     elif int(category_id) >= 1:
         if session.get("customer_id", None):
             # FIXME: This case is incorrectly placed and does not work, needs fixing
@@ -349,12 +351,6 @@ def home(category_id=0):
             map(lambda product: (product[0], product[1], product[2], product[3], product[4], product[5], False),
                 products))
 
-    #       print(products)
-
-    # sort the products
-    # products = sorted(products, key=lambda x: x[6], reverse=True)
-
-    # shuffle(products)
     return render_template("index.html", image_url=image_url,
                            categories=categories,
                            products=products)
@@ -496,7 +492,6 @@ if __name__ == "__main__":
     debug = app.config.get("DEBUG")
     app.run(port=PORT, debug=DEBUG)
 
-#TODO user email vermeyince sıkıntı olusturuyor
 
 """
 @app.route("/")

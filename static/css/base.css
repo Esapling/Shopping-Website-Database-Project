@@ -20,14 +20,3 @@ body{
     background-color: var(--bg-color-3);
     color: var(--main-color);
 }
-
-
-h2.flash-message{
-    position: relative;
-    font-size: 24px;
-    color:var(--main-color);
-    border: 10px solid var(--main-color);
-    border-radius: 0.4rem;
-    transition: 0.7s;
-    text-align: center;
-}

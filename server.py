@@ -65,11 +65,11 @@ IMAGE_URL = "https://dlcdnrog.asus.com/rog/media/157809658839.webp"
             [✔] Add description column
             [ ] Scrape data for other categories
             [ ] More data (?)
-        [⏳] Purchase      
+        [👀] Purchase      
             [✔] Check out / Payment - POST /cart/checkout/    + Stock control
             [👀] Mock transaction
             [✔] Bill class --> Create bill after transaction and add to database
-            [⏳] Add to purchase history
+            [✔] Add to purchase history
             [👀] Make buy button more visible
             [ ] FIXME: Purchase result information message to user 
         [⏳] Shoppingcart/box
@@ -77,7 +77,7 @@ IMAGE_URL = "https://dlcdnrog.asus.com/rog/media/157809658839.webp"
             [✔] Add to cart - PUT /cart/
             [✔] See current cart - GET /cart/
             [~] Remove item from cart - DELETE /cart/<item_id>/ --> Click on cart symbol to do so
-            [⏳] Purchase    - POST /cart/checkout/
+            [✔] Purchase    - POST /cart/checkout/
             [👀] Implement lira button for going to purchase page
         [👀] Webpage design
             [ ] FIXME: CSRF token checks!!
@@ -203,28 +203,25 @@ def checkout():
         if request.method == 'POST':
             if customer_id is not None:
                 order_obj = Order()
-
-                # Get cart items
-                # Create bill
-                # TODO: Create bill class and add bill to database
-                #   Compute total cost and check stock, if stock is not enough, do not proceed
-                #   Do mock transaction and create bill. Add bill to database
-                # Create order for selected products
-                # Message user if stock is not enough for some products
-                # Use in_stock_arr as a mask to select only in stock products
+                # TODO: Disable cart button if cart is empty
+                # TODO: Implement mock transaction
+                # Create order for products in cart and record item purchases
+                # Message user if stock is not enough for any products and cancel order
                 # Delete cart items, if order is successful
-                # DO everything in one big query
                 out_of_stock_products, order_res = order_obj.createOrder(customer_id)
                 if order_res:
                     msg = 'Purchase successfully made!'
-                    # FIXME: Message comes late
+                    # FIXME: Message comes late and does not show up. Only shows up when redirected to home page
                     flash('Purchase successfully made!', 'success')
                 else:
-                    out_of_stock_products = [product[0] for product in out_of_stock_products]
-                    if len(out_of_stock_products) == 1:
-                        msg = 'Item {} is out of stock'.format(out_of_stock_products[0])
+                    if out_of_stock_products is None:
+                        msg = 'Your cart is empty!'
                     else:
-                        msg = 'Items {} are out of stock'.format(", ".join(out_of_stock_products))
+                        out_of_stock_products = [product[0] for product in out_of_stock_products]
+                        if len(out_of_stock_products) == 1:
+                            msg = 'Item {} is out of stock'.format(out_of_stock_products[0])
+                        else:
+                            msg = 'Items {} are out of stock'.format(", ".join(out_of_stock_products))
                     flash(msg, 'info')
 
                 # TODO: Where should we redirect after checkout?

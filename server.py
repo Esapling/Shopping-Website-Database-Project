@@ -26,8 +26,10 @@ bootstrap = Bootstrap5(app)
 
 csrf = CSRFProtect()
 csrf.init_app(app)
+IMAGE_URL = "https://dlcdnrog.asus.com/rog/media/157809658839.webp"
 
-temporary_items = {}  # will keep items temporarily after interval operations
+temporary_items = {} # will keep items temporarily after interval operations
+
 
 """ 
     ✔ : DONE
@@ -125,10 +127,17 @@ temporary_items = {}  # will keep items temporarily after interval operations
 #                                             Purchase/Shop History                            #
 ################################################################################################
 # TODO
-@app.route("/purchase/<product_id>", methods=['GET', 'POST'])
-def purchase(product_id):
-    pass
-
+@app.route("/user/", methods=['GET', 'POST'])
+def user_page():
+    if 'logged_in' not in session or session['logged_in'] is not True:
+        return redirect(url_for('login', msg="Please first log in"))
+    else:
+        email = session['user_email'] 
+        customer = session['user']
+        if email != None and customer != None:
+            return render_template("user_page.html", customer=customer, email=email)
+        else:
+            return redirect(url_for('login', msg="Please first log in"))
 
 @app.route("/history/<customer_id>", methods=['GET', 'POST'])
 def see_shop_history(customer_id):
@@ -147,13 +156,34 @@ def see_shop_history(customer_id):
         # FIXME: Redirect to page to list all purchases
         #        Redirect to home page if no products purchased
         #
-        return render_template('cart.html', products=products_purchased)
+        print(products_purchased)
+        return render_template('purchase_history.html', products=products_purchased, img_url=IMAGE_URL)
 
 
 
 ################################################################################################
 #                                             Cart                                             #
 ################################################################################################
+
+@app.route("/remove_from_cart/", methods=['GET'])
+def remove_from_cart():
+    if not session.get("user_email", None):
+        return redirect(url_for('login', msg="Please first log in"))
+    else:
+        product_id = request.args.get('product_id')
+        customer_obj = Customer()
+        customer_id = customer_obj.getCustomerIdByEmail(session['user_email'])
+        if customer_id != None:
+            cart_obj = ShopBox()
+            cart_obj.remove_from_cart(customer_id=customer_id, product_id=product_id)
+            flash('Item successfully removed from cart!', 'success')
+            return redirect(request.referrer)
+        else:
+                flash('Error:', 'User is not found')
+                return redirect(url_for('home'))
+
+
+
 @app.route("/cart/", methods=['GET', 'POST'])
 def cart():
     if 'logged_in' not in session or session['logged_in'] is not True:
@@ -167,7 +197,7 @@ def cart():
             if customer_id is not None:
                 # get cart items
                 products = customer_obj.getCartItems(customer_id)
-                return render_template('cart.html', products=products)
+                return render_template('cart.html', products=products, image_url=IMAGE_URL)
             else:
                 flash('Error:', 'User is not found')
                 return redirect(url_for('home'))
@@ -365,8 +395,8 @@ def product_page(product_id):
 @app.route('/search', methods=['GET'])
 @app.route("/<category_id>")
 def home(category_id=0):
-    # TODO :user should be able to sort products in a category as well
-    # now this config only lets user one option amongst search, sort, retrieve from a certain category
+    #TODO :user should be able to sort products in a category as well 
+          # now this config only lets user one option amongst search, sort, retrieve from a certain category
     image_url = "https://dlcdnrog.asus.com/rog/media/157809658839.webp"
     # "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRITa7y1G8H3t5etxA6oyfOUO01v_YrImYpkQ&usqp=CAU"
     product_obj = Product()
@@ -398,7 +428,7 @@ def home(category_id=0):
             map(lambda product: (product[0], product[1], product[2], product[3], product[4], product[5], False),
                 products))
 
-    return render_template("index.html", image_url=image_url,
+    return render_template("index.html", image_url=IMAGE_URL,
                            categories=categories,
                            products=products)
 
@@ -429,6 +459,7 @@ def login():
             session['logged_in'] = True
             session['user_email'] = email
             session['customer_id'] = customer[4]
+            session['user'] = customer
             print("THIS IS YOUR EMAIL")
             print(session['user_email'])
             if 'temp_items' in session:

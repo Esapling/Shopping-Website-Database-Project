@@ -63,7 +63,21 @@ class ShopBox(DatabaseManagement):
                 cur.execute(query, (customer_id,))
                 products = cur.fetchall()
         return products
-
+    def searchItemInCart(self, customer_id, product_id):
+        item_exist = False
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                query = f"SELECT 1 from {self.table_name} where customer_id = %s AND product_id = %s"
+                cur.execute(query, (customer_id,product_id))
+                item_exist = cur.fetchone()
+            return item_exist
+        
+    def remove_from_cart(self, customer_id, product_id):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                query = f"DELETE FROM {self.table_name} where customer_id = %s AND product_id = %s"
+                cur.execute(query, (customer_id, product_id))
+            connection.commit()
 
 class Order(DatabaseManagement):
     def __init__(self) -> None:
@@ -103,7 +117,6 @@ class Order(DatabaseManagement):
                             LEFT JOIN product p ON oj.product_id = p.product_id 
                             WHERE o.customer_id = %s 
                             ORDER BY o.order_date DESC, o.order_id DESC"""
-
                 cur.execute(query, (customer_id,))
                 order_history = cur.fetchall()
         return order_history
@@ -270,7 +283,6 @@ class Customer(DatabaseManagement):
                 cur.execute(query, (customer_id,))
                 products = cur.fetchall()
         return products
-
     def addItemToCart(self, customer_id, product_id):
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:

@@ -1,5 +1,5 @@
 CREATE TABLE CUSTOMER_SHOP_BOX(
-    box_id SERIAL NOT NULL,
+    box_id PRIMARY KEY SERIAL NOT NULL,
     customer_id INT REFERENCES CUSTOMER (customer_id) 
         ON DELETE CASCADE
         ON UPDATE CASCADE,
@@ -7,6 +7,4 @@ CREATE TABLE CUSTOMER_SHOP_BOX(
     product_id INT NOT NULL REFERENCES PRODUCT (product_id) 
             ON DELETE CASCADE -- you missed the possiblity of buying the relevant item sadly :)
             ON UPDATE CASCADE,
-    
-    PRIMARY KEY (customer_id, product_id)
 );

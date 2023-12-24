@@ -28,6 +28,7 @@ csrf = CSRFProtect()
 csrf.init_app(app)
 
 temporary_items = {} # will keep items temporarily after interval operations
+IMAGE_URL = "https://dlcdnrog.asus.com/rog/media/157809658839.webp"
 
 
 """ 
@@ -141,6 +142,26 @@ def see_shop_history(customer_id):
 ################################################################################################
 #                                             Cart                                             #
 ################################################################################################
+
+@app.route("/remove_from_cart/", methods=['GET'])
+def remove_from_cart():
+    if not session.get("user_email", None):
+        return redirect(url_for('login', msg="Please first log in"))
+    else:
+        product_id = request.args.get('product_id')
+        customer_obj = Customer()
+        customer_id = customer_obj.getCustomerIdByEmail(session['user_email'])
+        if customer_id != None:
+            cart_obj = ShopBox()
+            cart_obj.remove_from_cart(customer_id=customer_id, product_id=product_id)
+            flash('Item successfully removed from cart!', 'success')
+            return redirect(request.referrer)
+        else:
+                flash('Error:', 'User is not found')
+                return redirect(url_for('home'))
+
+
+
 @app.route("/cart/", methods=['GET', 'POST'])
 def cart():
     if 'logged_in' not in session or session['logged_in'] is not True:
@@ -154,7 +175,7 @@ def cart():
             if customer_id is not None:
                 # get cart items
                 products = customer_obj.getCartItems(customer_id)
-                return render_template('cart.html', products=products)
+                return render_template('cart.html', products=products, image_url=IMAGE_URL)
             else:
                 flash('Error:', 'User is not found')
                 return redirect(url_for('home'))
@@ -360,7 +381,6 @@ def product_page(product_id):
 def home(category_id=0):
     #TODO :user should be able to sort products in a category as well 
           # now this config only lets user one option amongst search, sort, retrieve from a certain category
-    image_url = "https://dlcdnrog.asus.com/rog/media/157809658839.webp"
     # "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRITa7y1G8H3t5etxA6oyfOUO01v_YrImYpkQ&usqp=CAU"
     product_obj = Product()
     products = []
@@ -391,7 +411,7 @@ def home(category_id=0):
             map(lambda product: (product[0], product[1], product[2], product[3], product[4], product[5], False),
                 products))
 
-    return render_template("index.html", image_url=image_url,
+    return render_template("index.html", image_url=IMAGE_URL,
                            categories=categories,
                            products=products)
 

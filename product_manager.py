@@ -54,11 +54,17 @@ class Product(DatabaseManagement):
                 products = cur.fetchall()
                 return products
             
-    def sortProductPrices(self, opt):
+    def getProductsSorted(self, opt):
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:
                 if opt.lower() in ('asc', 'desc'):
                     query = f"select * from product ORDER BY price {opt}"
+                    cur.execute(query)
+                    products = cur.fetchall()
+                    return products
+                elif opt.lower() in ('name_asc', 'name_desc'):
+                    opt = opt.replace("name_", "") #cut selector (name) part from the option
+                    query = f"select * from product ORDER BY product_name {opt}"
                     cur.execute(query)
                     products = cur.fetchall()
                     return products

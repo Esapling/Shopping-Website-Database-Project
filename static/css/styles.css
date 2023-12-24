@@ -199,33 +199,25 @@ p.overview {
     color: var(--main-color);
 }
 
-
-
-
-
-
-
-/*
-.back .icon-fav{
-    width: 100%;
-    height: 3rem;
-    margin-bottom: 2%;
-    text-decoration: none;
-    content: "";
-}
-.back .icon-fav a::after{
-    content: "Favorite"; /* The message text */
-    /*
-    position: inherit;
-    display: none; /* Initially hidden 
-    color: var(--bg-color-2); /* Text color for the message 
-    font-size: 1.1rem;
-    padding-bottom: 10%;
-    border-radius: 5px;
-    white-space: nowrap; /* Prevent message from breaking into multiple line
-} 
-.back .icon-fav a:hover::after{
-    display: block; /* Show the message on hover 
-}
-*/
-
+.dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--bg-color-2);
+    border: 1px solid var(--bg-color-3);
+    padding: 5px 0;
+    z-index: 1000;
+  }
+  
+  .dropdown li {
+    margin: 0;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
+  .dropdown li:hover {
+    background-color: var(--bg-color-2);
+    color: black;
+  }
+  

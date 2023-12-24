@@ -44,6 +44,28 @@ class Product(DatabaseManagement):
                     return True
                 else:
                     return False
+                
+    def getProductsWithName(self, string):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                query = f"select * from product where product_name ILIKE %s" # ILIKE case insensitive while LIKE sensitive
+                search_string = f"%{string}%"
+                cur.execute(query, (search_string,))
+                products = cur.fetchall()
+                return products
+            
+    def sortProductPrices(self, opt):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                if opt.lower() in ('asc', 'desc'):
+                    query = f"select * from product ORDER BY price {opt}"
+                    cur.execute(query)
+                    products = cur.fetchall()
+                    return products
+                else:
+                    return None
+                
+
 
 
 class Category(DatabaseManagement):

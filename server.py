@@ -26,6 +26,7 @@ bootstrap = Bootstrap5(app)
 
 csrf = CSRFProtect()
 csrf.init_app(app)
+IMAGE_URL = "https://dlcdnrog.asus.com/rog/media/157809658839.webp"
 
 temporary_items = {} # will keep items temporarily after interval operations
 
@@ -123,10 +124,17 @@ temporary_items = {} # will keep items temporarily after interval operations
 #                                             Purchase/Shop History                            #
 ################################################################################################
 # TODO
-@app.route("/purchase/<product_id>", methods=['GET', 'POST'])
-def purchase(product_id):
-    pass
-
+@app.route("/user/", methods=['GET', 'POST'])
+def user_page():
+    if 'logged_in' not in session or session['logged_in'] is not True:
+        return redirect(url_for('login', msg="Please first log in"))
+    else:
+        email = session['user_email'] 
+        customer = session['user']
+        if email != None and customer != None:
+            return render_template("user_page.html", customer=customer, email=email)
+        else:
+            return redirect(url_for('login', msg="Please first log in"))
 
 @app.route("/history/<customer_id>", methods=['GET', 'POST'])
 def see_shop_history(customer_id):
@@ -145,7 +153,8 @@ def see_shop_history(customer_id):
         # FIXME: Redirect to page to list all purchases
         #        Redirect to home page if no products purchased
         #
-        return render_template('cart.html', products=products_purchased)
+        print(products_purchased)
+        return render_template('purchase_history.html', products=products_purchased, img_url=IMAGE_URL)
 
 
 
@@ -447,6 +456,7 @@ def login():
             session['logged_in'] = True
             session['user_email'] = email
             session['customer_id'] = customer[4]
+            session['user'] = customer
             print("THIS IS YOUR EMAIL")
             print(session['user_email'])
             if 'temp_items' in session:

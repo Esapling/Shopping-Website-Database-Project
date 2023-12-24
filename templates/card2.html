@@ -1,21 +1,23 @@
 <div class="card">
     <div
       class="front"
-      style="background: url('{{image_url}}');  background-size: cover; background-position: center;">
-      <p class="large">{{product[1]}}</p>
+      style="background: url('https://dlcdnrog.asus.com/rog/media/157809658839.webp');  background-size: cover; background-position: center;">
+      <p class="large">{{product[3]}}</p>
     </div>
     <div class="back" style="padding-left: 0px; padding-right: 0px; padding-top: 3.4rem">
       <div class="container">
-        <div class="title">Name: {{product[2]}}</div>
+        <div class="title">Order ID: {{product[0]}}</div>
         <div class="rating">
-          <label>Price: {{product[3]}} $</label>
+          <label>Total Price: {{product[2]}} $</label>
           <i class="fas fa-star star"></i>
         </div>
-        <p class="review">Amount:{{product[2]}} </p>
+        <p class="review">Unit Price:{{product[4]}} </p>
+        <p class="review">Amount:{{product[5]}} </p>
+
         <p class="overview">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi rem
-          laboriosam adipisci qui quasi expedita ut accusamus, earum illum amet.
-        </p>
+          Order Date:
+          {{product[1]}}
+          </p>
       </div>
     </div>
   </div>

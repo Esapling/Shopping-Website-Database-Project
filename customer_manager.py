@@ -117,7 +117,6 @@ class Order(DatabaseManagement):
                             LEFT JOIN product p ON oj.product_id = p.product_id 
                             WHERE o.customer_id = %s 
                             ORDER BY o.order_date DESC, o.order_id DESC"""
-
                 cur.execute(query, (customer_id,))
                 order_history = cur.fetchall()
         return order_history

@@ -28,8 +28,7 @@ csrf = CSRFProtect()
 csrf.init_app(app)
 IMAGE_URL = "https://dlcdnrog.asus.com/rog/media/157809658839.webp"
 
-temporary_items = {} # will keep items temporarily after interval operations
-
+temporary_items = {}  # will keep items temporarily after interval operations
 
 """ 
     ✔ : DONE
@@ -126,18 +125,19 @@ temporary_items = {} # will keep items temporarily after interval operations
 ################################################################################################
 #                                             Purchase/Shop History                            #
 ################################################################################################
-# TODO
+
 @app.route("/user/", methods=['GET', 'POST'])
 def user_page():
     if 'logged_in' not in session or session['logged_in'] is not True:
         return redirect(url_for('login', msg="Please first log in"))
     else:
-        email = session['user_email'] 
+        email = session['user_email']
         customer = session['user']
-        if email != None and customer != None:
+        if email is not None and customer is not None:
             return render_template("user_page.html", customer=customer, email=email)
         else:
             return redirect(url_for('login', msg="Please first log in"))
+
 
 @app.route("/history/<customer_id>", methods=['GET', 'POST'])
 def see_shop_history(customer_id):
@@ -160,7 +160,6 @@ def see_shop_history(customer_id):
         return render_template('purchase_history.html', products=products_purchased, img_url=IMAGE_URL)
 
 
-
 ################################################################################################
 #                                             Cart                                             #
 ################################################################################################
@@ -173,15 +172,14 @@ def remove_from_cart():
         product_id = request.args.get('product_id')
         customer_obj = Customer()
         customer_id = customer_obj.getCustomerIdByEmail(session['user_email'])
-        if customer_id != None:
+        if customer_id is not None:
             cart_obj = ShopBox()
             cart_obj.remove_from_cart(customer_id=customer_id, product_id=product_id)
             flash('Item successfully removed from cart!', 'success')
             return redirect(request.referrer)
         else:
-                flash('Error:', 'User is not found')
-                return redirect(url_for('home'))
-
+            flash('Error:', 'User is not found')
+            return redirect(url_for('home'))
 
 
 @app.route("/cart/", methods=['GET', 'POST'])
@@ -395,8 +393,8 @@ def product_page(product_id):
 @app.route('/search', methods=['GET'])
 @app.route("/<category_id>")
 def home(category_id=0):
-    #TODO :user should be able to sort products in a category as well 
-          # now this config only lets user one option amongst search, sort, retrieve from a certain category
+    # TODO :user should be able to sort products in a category as well
+    # now this config only lets user one option amongst search, sort, retrieve from a certain category
     image_url = "https://dlcdnrog.asus.com/rog/media/157809658839.webp"
     # "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRITa7y1G8H3t5etxA6oyfOUO01v_YrImYpkQ&usqp=CAU"
     product_obj = Product()
@@ -495,9 +493,9 @@ def sign_up(msg=None):
             # 2nd case , customer_id is not none ->  user with given phone number already registered,
             is_customer_registered = customer_obj.checkCustomerRegisteredById(customer_id)
             if is_customer_registered:
-                msg = f"Welcome {customer_dict['name']}, you have already registered, you can log in."
+                msg = f"A user with given email or phone number already exists. Please try again"
             else:  # 3rd case customer exists but not registered yet
-                msg = "You successfully registered , you can Log in now"
+                msg = "You successfully registered, you can Log in now"
                 customer_obj.registerCustomer(customer_id, customer_dict["email"], customer_dict["password"])
             return redirect(url_for('login', msg=msg))
     else:

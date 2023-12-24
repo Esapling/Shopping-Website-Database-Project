@@ -138,8 +138,8 @@ class Order(DatabaseManagement):
                 # Handle the case where the cart is empty
                 query = f"SELECT COUNT(*) from {view_name_c}"
                 cur.execute(query)
-                cart_size = cur.fetchone()
-                if cart_size[0] == 0:
+                cart_size = cur.fetchone()[0]
+                if cart_size == 0:
                     connection.close()
                     return None, False
 
@@ -151,18 +151,14 @@ class Order(DatabaseManagement):
                 cur.execute(query)
 
                 # Check if stock is available for all products in the cart --> supply >= demand
-                query = (f"SELECT COUNT(s.price), SUM(s.price) from {view_name_c} s left join {view_name_p} d "
+                query = (f"SELECT COUNT(s.product_id), SUM(s.price) from {view_name_c} s left join {view_name_p} d "
                          f"on s.product_id = d.product_id where s.inventory >= d.count")
                 cur.execute(query)
                 num_in_stock, total_price = cur.fetchone()
 
-                query = f"SELECT COUNT(*) from {view_name_p} "
-                cur.execute(query)
-                num_requested = cur.fetchone()[0]
-
                 # Handle the case where a product stock is not enough
                 # Stock is not available for at least one product
-                if num_in_stock < num_requested:  # total_price[0][0] is None:
+                if num_in_stock < cart_size:  # total_price[0][0] is None:
                     # Find the products that are out of stock to inform the user
                     query = (f"SELECT DISTINCT s.product_name from {view_name_c} s join {view_name_p} d "
                              f"on s.product_id = d.product_id where s.inventory < d.count")

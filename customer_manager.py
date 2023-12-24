@@ -31,7 +31,7 @@ class FavBox(DatabaseManagement):
                 cur.execute(query, (customer_id,))
                 products = cur.fetchall()
         return products
-    
+
     def searchItem(self, customer_id: int, product_id: int):
         x = None
         with psycopg.connect(**self.db_params) as connection:
@@ -40,8 +40,6 @@ class FavBox(DatabaseManagement):
                 cur.execute(query, (customer_id, product_id))
                 x = cur.fetchone()
         return x
-
-        
 
 
 class ShopBox(DatabaseManagement):
@@ -86,8 +84,7 @@ class Order(DatabaseManagement):
     def createOrder(self, customer_id):
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:
-                # FIXME: Handle cases where multiple products of the same id are bought and stocks may not be enough!!
-                # Get products from customer_shop_box for given customer on condition of all inventory > 0
+                # Get products from customer_shop_box for given customer on condition of all product inventory > requested
                 # TODO: store product id for later shopping history
                 # Cart view
                 view_name_c = 'customer_shop_box_view'
@@ -103,7 +100,7 @@ class Order(DatabaseManagement):
                          f"FROM {view_name_c} AS v GROUP BY v.product_id, v.price)")
                 cur.execute(query)
 
-                # Check if stock is available for all products
+                # Check if stock is available for all products in the cart
                 query = (f"SELECT SUM(s.price) from {view_name_c} s left join {view_name_p} d "
                          f"on s.product_id = d.product_id where s.inventory >= d.count")
                 cur.execute(query)
@@ -124,21 +121,26 @@ class Order(DatabaseManagement):
                              f"{view_name_p} AS sq WHERE sq.product_id = p.product_id")
                     cur.execute(query)
                     # Insert order into customer_orders table, with total price
-                    query = f"INSERT INTO purchase_order (customer_id, total_price) VALUES (%s, %s)"
+                    # (Order state is true for now, it will be updated only after the order is delivered)
+                    query = (f"INSERT INTO purchase_order (customer_id, order_state, total_price) VALUES (%s, true, %s)"
+                             f" RETURNING order_id")
                     cur.execute(query, (customer_id, total_price[0][0]))
-                    """
-                    # Record items bought to order_junction table using purchase_order and 
-                    query = (f"INSERT INTO order_junction (order_id, product_id, count, ) "
-                             f"SELECT po.order_id, sq.product_id, sq.count,  FROM {view_name_p} AS sq "
-                             f"LEFT JOIN purchase_order AS po ON po.customer_id = %s")"""
+
+                    # Get the last inserted ID
+                    last_inserted_order_id = cur.fetchone()[0]
+                    # Record items bought to order_junction table using latest purchase_order
+                    query = (f"INSERT INTO order_junction (order_id, product_id, product_amount, unit_product_price) "
+                             f"SELECT o.order_id,v.product_id,v.count as product_amount,v.price as unit_product_price "
+                             f"FROM {view_name_p} AS v LEFT JOIN purchase_order AS o "
+                             f"ON o.order_id = {last_inserted_order_id} RETURNING order_id")
+                    cur.execute(query)
 
                     # Remove bought products from customer_shop_box
                     query = f"DELETE FROM customer_shop_box WHERE customer_id = %s"
                     cur.execute(query, (customer_id,))
 
-
-
             connection.commit()
+            connection.close()
             return None, True
 
 
@@ -156,6 +158,7 @@ class Customer(DatabaseManagement):
                 query = f"UPDATE {self.table_name} SET customer_email = %s, customer_password = %s where customer_id = %s"
                 cur.execute(query, (email, hashed_password, customer_id))
             connection.commit()
+            connection.close()
 
     def addCustomer(self, customer_dict):
         """ 
@@ -172,6 +175,7 @@ class Customer(DatabaseManagement):
                             (customer_dict['name'], customer_dict['phone'], customer_dict['address'], True,
                              customer_dict['email'], hashed_password))
             connection.commit()
+            connection.close()
 
     def checkCustomerRegisteredById(self, customer_id: int):
         """
@@ -231,6 +235,7 @@ class Customer(DatabaseManagement):
                 query = f"INSERT INTO customer_shop_box (customer_id, product_id) VALUES (%s, %s)"
                 cur.execute(query, (customer_id, product_id))
             connection.commit()
+            connection.close()
 
     def emptyCart(self, customer_id):
         with psycopg.connect(**self.db_params) as connection:
@@ -238,6 +243,7 @@ class Customer(DatabaseManagement):
                 query = f"DELETE FROM customer_shop_box WHERE customer_id = %s"
                 cur.execute(query, (customer_id,))
             connection.commit()
+            connection.close()
 
     # login
     def validateCustomerRegistered(self, email_addr, password):
@@ -293,6 +299,7 @@ class Customer(DatabaseManagement):
                 if customer is not None:
                     # if the customer id is not the same as the given id, then it is a different customer
                     if customer[0] != customer_id:
+                        connection.close()
                         return False
                     # Update customer info
                     else:
@@ -301,6 +308,7 @@ class Customer(DatabaseManagement):
                         cur.execute(query, (customer_dict['name'], customer_dict['phone'], customer_dict['address'],
                                             customer_dict['email'], customer_id))
                         connection.commit()
+                        connection.close()
                         return True
 
     def deleteCustomer(self, customer_id):
@@ -309,6 +317,7 @@ class Customer(DatabaseManagement):
                 query = f"""DELETE FROM {self.table_name} WHERE customer_id = %s"""
                 cur.execute(query, (customer_id,))
             connection.commit()
+            connection.close()
             print('G\'bye world')
 
     # def getCustomerIdByEmail(self, email):

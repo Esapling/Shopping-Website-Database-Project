@@ -107,23 +107,8 @@ class Order(DatabaseManagement):
                 query = (f"SELECT SUM(s.price) from {view_name_c} s left join {view_name_p} d "
                          f"on s.product_id = d.product_id where s.inventory >= d.count")
                 cur.execute(query)
-                """
-                # Following was code was made redundant by using view
-                query = (f"SELECT SUM(p.price) from customer_shop_box csb left join"
-                         f" product p on csb.product_id = p.product_id where csb.customer_id = %s "
-                         f"and 0 < ALL"
-                         f"(SELECT p.inventory from customer_shop_box csb left join"
-                         f" product p on csb.product_id = p.product_id where csb.customer_id = %s)")
-                cur.execute(query, (customer_id, customer_id,))
-                """
-                """
 
-                query = (f"SELECT SUM(csb1.price) from {view_name_p} as csb1 where csb1.count "  # --> DEMAND vs 
-                         f"< ALL (SELECT csb2.inventory from {view_name_c} csb2 "  # --> SUPPLY
-                         f"where csb2.product_id = csb1.product_id)")"""
-
-
-                # Handle the case where a product is out of stock
+                # Handle the case where a product stock is not enough
                 total_price = cur.fetchall()
                 # Stock is not available for at least one product
                 if total_price[0][0] is None:
@@ -141,14 +126,16 @@ class Order(DatabaseManagement):
                     # Insert order into customer_orders table, with total price
                     query = f"INSERT INTO purchase_order (customer_id, total_price) VALUES (%s, %s)"
                     cur.execute(query, (customer_id, total_price[0][0]))
-                    # Remove products from customer_shop_box
+                    """
+                    # Record items bought to order_junction table using purchase_order and 
+                    query = (f"INSERT INTO order_junction (order_id, product_id, count, ) "
+                             f"SELECT po.order_id, sq.product_id, sq.count,  FROM {view_name_p} AS sq "
+                             f"LEFT JOIN purchase_order AS po ON po.customer_id = %s")"""
+
+                    # Remove bought products from customer_shop_box
                     query = f"DELETE FROM customer_shop_box WHERE customer_id = %s"
                     cur.execute(query, (customer_id,))
-                    """
-                    # Record items bought to order_junction table
-                    query = (f"INSERT INTO order_junction (order_id, product_id, count) "
-                             f"SELECT po.order_id, sq.product_id, sq.count FROM {view_name_p} AS sq "
-                             f"LEFT JOIN purchase_order AS po ON po.customer_id = %s")"""
+
 
 
             connection.commit()

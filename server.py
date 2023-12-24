@@ -64,19 +64,19 @@ csrf.init_app(app)
             [ ] Scrape data for other categories
             [ ] More data (?)
         [⏳] Purchase      
-            [⏳] Check out / Payment - POST /cart/checkout/    + Stock control
+            [✔] Check out / Payment - POST /cart/checkout/    + Stock control
             [👀] Mock transaction
-            [X?] Bill class --> Create bill after transaction and add to database
-            [?] Add to purchase history
+            [✔] Bill class --> Create bill after transaction and add to database
+            [⏳] Add to purchase history
             [👀] Make buy button more visible
             [ ] FIXME: Purchase result information message to user 
-            [?] Add to purchase history
         [⏳] Shoppingcart/box
+            [ ] FIXME: Add to cart button CSRF request must be under control
             [✔] Add to cart - PUT /cart/
             [✔] See current cart - GET /cart/
             [~] Remove item from cart - DELETE /cart/<item_id>/ --> Click on cart symbol to do so
             [⏳] Purchase    - POST /cart/checkout/
-            [ ] What is lira button for? --> going to purchase page?
+            [👀] Implement lira button for going to purchase page
         [👀] Webpage design
             [ ] FIXME: CSRF token checks!!
             [ ] Add logo

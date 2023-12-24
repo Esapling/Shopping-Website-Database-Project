@@ -107,6 +107,27 @@ csrf.init_app(app)
             
 """
 
+################################################################################################
+#                                             Purhcase/Shop History                            #
+################################################################################################
+#TODO
+@app.route("/purchase/<product_id>", methods=['GET', 'POST'])
+def purchase(product_id):
+    pass
+
+
+@app.route("/history/<customer_id>", methods=['GET', 'POST'])
+def see_shop_history(customer_id):
+    if 'logged_in' not in session or session['logged_in'] is not True:
+        return redirect(url_for('login', msg="Please first log in"))
+    else:
+        order_obj = Order()
+        products_purchased = order_obj.getItems(customer_id= customer_id)
+        return render_template('cart.html', products=products_purchased)
+        #TODO
+
+        
+        
 
 ################################################################################################
 #                                             Cart                                             #
@@ -385,6 +406,7 @@ def login():
             print("THIS IS YOUR EMAIL")
             print(session['user_email'])
             print(email)
+            print(customer)
             return render_template("user_page.html", customer=customer, email=email)
     else:
         return "INVALID REQUEST"

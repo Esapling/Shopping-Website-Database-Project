@@ -24,6 +24,7 @@ class FavBox(DatabaseManagement):
 
             connection.commit()
 
+    # NOTE: Not used
     def getItems(self, customer_id):
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:
@@ -46,6 +47,7 @@ class ShopBox(DatabaseManagement):
     def __init__(self) -> None:
         super().__init__(table_name="CUSTOMER_SHOP_BOX")
 
+    # NOTE: Not used
     def addItemToShopBox(self, customer_id: int, product_id: int):
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:
@@ -53,6 +55,7 @@ class ShopBox(DatabaseManagement):
                 cur.execute(query, (customer_id, product_id))
             connection.commit()
 
+    # NOTE: Not used
     def getItems(self, customer_id):
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:
@@ -66,29 +69,41 @@ class Order(DatabaseManagement):
     def __init__(self) -> None:
         super().__init__(table_name="PURCHASE_ORDER")
 
+    """
     def addOrder(self, customer_id: int, product_id: int):
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:
-                query = f"INSERT INTO {self.table_name} (customer_id, product_id) VALUES (%s, %s)"
+                query = f"INSERT INTO {self.table_name} (customer_id, order_id) VALUES (%s, %s)"
                 cur.execute(query, (customer_id, product_id))
             connection.commit()
 
     def getItems(self, customer_id):
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:
-                query = f"SELECT product_id from {self.table_name} where customer_id = %s"
+                query = f"SELECT order_id from {self.table_name} where customer_id = %s"
                 cur.execute(query, (customer_id,))
                 products = cur.fetchall()
         return products
+    """
 
     # Get all individual item orders history of a customer using order_junction table
     def getCustomerOrderHistory(self, customer_id):
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:
-                query = (f"SELECT po.order_id, po.order_date, po.order_state, po.total_price, po.order_date, "
-                         f"oj.product_id, oj.product_amount, oj.unit_product_price "
-                         f"from purchase_order po left join order_junction oj on po.order_id = oj.order_id "
-                         f"where po.customer_id = %s")
+                # (Important) List orders as a list of dictionaries containing
+                #   order information (total cost, order date,...) as titles
+                #   and more details (product names, individual prices, etc.) as info-items
+                #  OR...
+                #  --> Simply list all purchased products and their prices with order date and numbers for customer
+                # Listing: order no, order date, total price(?), product name, unit price, product amount
+                query = """SELECT o.order_id AS Order_No, o.order_date AS Date, o.total_price AS Total_order_cost, 
+                            p.product_name AS Name, p.price, oj.product_amount AS Amount_bought
+                            FROM purchase_order o 
+                            LEFT JOIN order_junction oj ON o.order_id = oj.order_id 
+                            LEFT JOIN product p ON oj.product_id = p.product_id 
+                            WHERE o.customer_id = %s 
+                            ORDER BY o.order_date DESC, o.order_id DESC"""
+
                 cur.execute(query, (customer_id,))
                 order_history = cur.fetchall()
         return order_history
@@ -150,8 +165,8 @@ class Order(DatabaseManagement):
                     # Get the last inserted ID
                     last_inserted_order_id = cur.fetchone()[0]
                     # Record items bought to order_junction table using latest purchase_order
-                    query = (f"INSERT INTO order_junction (order_id, product_id, product_amount, unit_product_price) "
-                             f"SELECT o.order_id,v.product_id,v.count as product_amount,v.price as unit_product_price "
+                    query = (f"INSERT INTO order_junction (order_id, product_id, product_amount) "
+                             f"SELECT o.order_id,v.product_id,v.count as product_amount "
                              f"FROM {view_name_p} AS v LEFT JOIN purchase_order AS o "
                              f"ON o.order_id = {last_inserted_order_id} RETURNING order_id")
                     cur.execute(query)
@@ -176,7 +191,8 @@ class Customer(DatabaseManagement):
 
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:
-                query = f"UPDATE {self.table_name} SET customer_email = %s, customer_password = %s where customer_id = %s"
+                query = (f"UPDATE {self.table_name} SET customer_email = %s, customer_password = %s "
+                         f"where customer_id = %s")
                 cur.execute(query, (email, hashed_password, customer_id))
             connection.commit()
             connection.close()
@@ -208,7 +224,7 @@ class Customer(DatabaseManagement):
                 query = f"SELECT is_registered FROM {self.table_name} where customer_id = %s"
                 cur.execute(query, (customer_id,))
                 is_registered_tuple = cur.fetchone()  # returned object is tuple
-                if is_registered_tuple[0] == True:
+                if is_registered_tuple[0]:
                     return True
                 else:
                     return False

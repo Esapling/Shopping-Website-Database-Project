@@ -27,8 +27,7 @@ bootstrap = Bootstrap5(app)
 csrf = CSRFProtect()
 csrf.init_app(app)
 
-temporary_items = {} # will keep items temporarily after interval operations
-
+temporary_items = {}  # will keep items temporarily after interval operations
 
 """ 
     ✔ : DONE
@@ -48,7 +47,7 @@ temporary_items = {} # will keep items temporarily after interval operations
             [~] Get access to user page from main page
             [ ] Stay logged in --> do not show login tab when logged in, show user profile tab
                 <<<User tab and login tab should be different>>>
-            [?] See past transactions - GET /login/<customer_id>/transactions/
+            [⏳] See past transactions - GET /login/<customer_id>/transactions/
             [X] While signing up address shouldn't be character limited
         [✔] Favorites
             [✔] Insert (like)
@@ -60,8 +59,9 @@ temporary_items = {} # will keep items temporarily after interval operations
             [⏳] FIXME: Why is getCategoryProductsWithLikes called and not getCategoryProducts?
                         Also getCategoryProductsWithLikes is not working properly.
             [⏳] Sort alphabetical
-            [] Sort by cost
+            [ ] Sort by cost
             [✔] Add description column
+            [👀] Display description on main page
             [ ] Scrape data for other categories
             [ ] More data (?)
         [👀] Purchase      
@@ -71,6 +71,8 @@ temporary_items = {} # will keep items temporarily after interval operations
             [✔] Add to purchase history
             [👀] Make buy button more visible
             [ ] FIXME: Purchase result information message to user 
+            [?] Order id to only refer to id related to customer, 
+                purchase_order table primary key would be order id + customer id
         [⏳] Shoppingcart/box
             [ ] FIXME: Add to cart button CSRF request must be under control
             [✔] Add to cart - PUT /cart/
@@ -115,10 +117,11 @@ temporary_items = {} # will keep items temporarily after interval operations
             
 """
 
+
 ################################################################################################
-#                                             Purhcase/Shop History                            #
+#                                             Purchase/Shop History                            #
 ################################################################################################
-#TODO
+# TODO
 @app.route("/purchase/<product_id>", methods=['GET', 'POST'])
 def purchase(product_id):
     pass
@@ -131,12 +134,19 @@ def see_shop_history(customer_id):
         return redirect(url_for('login', msg="Please first log in"))
     else:
         order_obj = Order()
-        products_purchased = order_obj.getItems(customer_id= customer_id)
-        return render_template('cart.html', products=products_purchased)
-        #TODO
+        products_purchased = order_obj.getCustomerOrderHistory(customer_id=customer_id)
 
-        
-        
+        # Check if customer has purchased any products
+        if products_purchased is None:
+            flash('No products purchased yet!', 'info')
+            return redirect(url_for('home'))
+
+        # FIXME: Redirect to page to list all purchases
+        #        Redirect to home page if no products purchased
+        #
+        return render_template('cart.html', products=products_purchased)
+
+
 
 ################################################################################################
 #                                             Cart                                             #
@@ -272,7 +282,6 @@ def add_favs(product_id):
 #         else:
 #             flash('User is not found')
 #             return redirect(url_for('home'))
-      
 
 
 @app.route("/add_to_favs/<product_id>", methods=['POST', 'GET'])
@@ -295,8 +304,6 @@ def add_to_favs(product_id):
         else:
             flash('User is not found')
             return redirect(url_for('home'))
-
-
 
 
 @app.route("/remove_from_favs/<product_id>", methods=['POST', 'GET'])
@@ -355,8 +362,8 @@ def product_page(product_id):
 @app.route('/search', methods=['GET'])
 @app.route("/<category_id>")
 def home(category_id=0):
-    #TODO :user should be able to sort products in a category as well 
-          # now this config only lets user one option amongst search, sort, retrieve from a certain category
+    # TODO :user should be able to sort products in a category as well
+    # now this config only lets user one option amongst search, sort, retrieve from a certain category
     image_url = "https://dlcdnrog.asus.com/rog/media/157809658839.webp"
     # "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRITa7y1G8H3t5etxA6oyfOUO01v_YrImYpkQ&usqp=CAU"
     product_obj = Product()
@@ -365,8 +372,8 @@ def home(category_id=0):
     categories = category_obj.getRecords()  # list of tuples each tuple element is a row or record
     if "filtered" in request.args:
         filter_opt = request.args.get('filtered')
-        products = product_obj.getProductsSorted(filter_opt)  
-        print(products)      
+        products = product_obj.getProductsSorted(filter_opt)
+        print(products)
     elif 'search' in request.args:
         searched_product = request.get('search')
         products = product_obj.getProductsWithName(string=searched_product)
@@ -527,11 +534,10 @@ def delete_user(customer_id):
 
 
 if __name__ == "__main__":
-    #app.config.from_object("config")
-    #port = app.config.get("PORT", 5000)
+    # app.config.from_object("config")
+    # port = app.config.get("PORT", 5000)
     debug = app.config.get("DEBUG")
     app.run(port=PORT, debug=DEBUG)
-
 
 """
 @app.route("/")

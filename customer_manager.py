@@ -93,6 +93,14 @@ class Order(DatabaseManagement):
                          f"left join product p on csb.product_id = p.product_id where csb.customer_id = {customer_id})")
                 cur.execute(query)
 
+                # Handle the case where the cart is empty
+                query = f"SELECT COUNT(*) from {view_name_c}"
+                cur.execute(query)
+                cart_size = cur.fetchone()
+                if cart_size[0] == 0:
+                    connection.close()
+                    return None, False
+
                 # Purchase view
                 view_name_p = 'purchase_view'
                 query = (f"CREATE OR REPLACE VIEW {view_name_p} AS "
@@ -106,13 +114,14 @@ class Order(DatabaseManagement):
                 cur.execute(query)
 
                 # Handle the case where a product stock is not enough
-                total_price = cur.fetchall()
+                total_price = cur.fetchone()
                 # Stock is not available for at least one product
-                if total_price[0][0] is None:
+                if total_price[0] is None:  # total_price[0][0] is None:
                     # Find the products that are out of stock to inform the user
                     query = f"SELECT csb.product_name from {view_name_c} csb where csb.inventory = 0 "
                     cur.execute(query)
                     out_of_stock_products = cur.fetchall()
+                    connection.close()
                     return out_of_stock_products, False
                 # Stock is available for all products
                 else:
@@ -124,7 +133,7 @@ class Order(DatabaseManagement):
                     # (Order state is true for now, it will be updated only after the order is delivered)
                     query = (f"INSERT INTO purchase_order (customer_id, order_state, total_price) VALUES (%s, true, %s)"
                              f" RETURNING order_id")
-                    cur.execute(query, (customer_id, total_price[0][0]))
+                    cur.execute(query, (customer_id, total_price[0]))
 
                     # Get the last inserted ID
                     last_inserted_order_id = cur.fetchone()[0]

@@ -64,7 +64,7 @@ class ShopBox(DatabaseManagement):
 
 class Order(DatabaseManagement):
     def __init__(self) -> None:
-        super().__init__(table_name="CUSTOMER_ORDERS")
+        super().__init__(table_name="PURCHASE_ORDER")
 
     def addOrder(self, customer_id: int, product_id: int):
         with psycopg.connect(**self.db_params) as connection:
@@ -81,11 +81,23 @@ class Order(DatabaseManagement):
                 products = cur.fetchall()
         return products
 
+    # Get all individual item orders history of a customer using order_junction table
+    def getCustomerOrderHistory(self, customer_id):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                query = (f"SELECT po.order_id, po.order_date, po.order_state, po.total_price, po.order_date, "
+                         f"oj.product_id, oj.product_amount, oj.unit_product_price "
+                         f"from purchase_order po left join order_junction oj on po.order_id = oj.order_id "
+                         f"where po.customer_id = %s")
+                cur.execute(query, (customer_id,))
+                order_history = cur.fetchall()
+        return order_history
+
     def createOrder(self, customer_id):
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:
-                # Get products from customer_shop_box for given customer on condition of all product inventory > requested
-                # TODO: store product id for later shopping history
+                # Get products from customer_shop_box for given customer
+                # on condition of all product fulfilling condition: inventory > requested
                 # Cart view
                 view_name_c = 'customer_shop_box_view'
                 query = (f"CREATE OR REPLACE VIEW {view_name_c} AS "
@@ -131,8 +143,8 @@ class Order(DatabaseManagement):
                     cur.execute(query)
                     # Insert order into customer_orders table, with total price
                     # (Order state is true for now, it will be updated only after the order is delivered)
-                    query = (f"INSERT INTO purchase_order (customer_id, order_state, total_price) VALUES (%s, true, %s)"
-                             f" RETURNING order_id")
+                    query = (f"INSERT INTO {self.table_name} (customer_id, order_state, total_price) "
+                             f"VALUES (%s, true, %s) RETURNING order_id")
                     cur.execute(query, (customer_id, total_price[0]))
 
                     # Get the last inserted ID

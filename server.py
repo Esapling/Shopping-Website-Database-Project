@@ -48,6 +48,7 @@ csrf.init_app(app)
             [ ] Stay logged in --> do not show login tab when logged in, show user profile tab
                 <<<User tab and login tab should be different>>>
             [?] See past transactions - GET /login/<customer_id>/transactions/
+            [X] While signing up address shouldn't be character limited
         [✔] Favorites
             [✔] Insert (like)
             [✔] Delete (dislike)
@@ -66,13 +67,18 @@ csrf.init_app(app)
             [⏳] Check out / Payment - POST /cart/checkout/    + Stock control
             [👀] Mock transaction
             [X?] Bill class --> Create bill after transaction and add to database
+            [?] Add to purchase history
+            [👀] Make buy button more visible
+            [ ] FIXME: Purchase result information message to user 
+            [?] Add to purchase history
         [⏳] Shoppingcart/box
             [✔] Add to cart - PUT /cart/
             [✔] See current cart - GET /cart/
-            [~] Remove item from cart - DELETE /cart/<item_id>/
+            [~] Remove item from cart - DELETE /cart/<item_id>/ --> Click on cart symbol to do so
             [⏳] Purchase    - POST /cart/checkout/
             [ ] What is lira button for? --> going to purchase page?
         [👀] Webpage design
+            [ ] FIXME: CSRF token checks!!
             [ ] Add logo
             [✔] Add site name (remove database title)
             [ ] Replace login with user profile page
@@ -81,6 +87,7 @@ csrf.init_app(app)
             [ ] Update footer information
             [?] Product individual pages
         [X] Stores
+            [ ] Store name column required
             [ ] Add products but from new store
             [ ] Implement stocking by store
         [X] Admin/Employees
@@ -148,29 +155,33 @@ def checkout():
         customer_id = customer_obj.getCustomerIdByEmail(session['user_email'])
         if request.method == 'POST':
             if customer_id is not None:
-                customer_obj = Customer()
-                product_obj = Product()
                 order_obj = Order()
 
                 # Get cart items
-                products = customer_obj.getCartItems(customer_id)
                 # Create bill
                 # TODO: Create bill class and add bill to database
                 #   Compute total cost and check stock, if stock is not enough, do not proceed
                 #   Do mock transaction and create bill. Add bill to database
-
-                in_stock_arr = [product_obj.checkStock(product.product_id) for product in products]
-                # or product[-1] ??
                 # Create order for selected products
                 # Message user if stock is not enough for some products
                 # Use in_stock_arr as a mask to select only in stock products
-                # OR
-                # do everything in one big query
-                order_obj.createOrder(customer_id, products[in_stock_arr])
-                # Only delete cart items, that are in the order
+                # Delete cart items, if order is successful
+                # DO everything in one big query
+                out_of_stock_products, order_res = order_obj.createOrder(customer_id)
+                if order_res:
+                    msg = 'Purchase successfully made!'
+                    # FIXME: Message comes late
+                    flash('Purchase successfully made!', 'success')
+                else:
+                    out_of_stock_products = [product[0] for product in out_of_stock_products]
+                    if len(out_of_stock_products) == 1:
+                        msg = 'Item {} is out of stock'.format(out_of_stock_products[0])
+                    else:
+                        msg = 'Items {} are out of stock'.format(", ".join(out_of_stock_products))
+                    flash(msg, 'info')
 
                 # TODO: Where should we redirect after checkout?
-                return render_template('cart.html', products=products)
+                return redirect(url_for('cart', msg=msg))
             else:
                 flash('Error:', 'User is not found')
                 return redirect(url_for('home'))
@@ -346,7 +357,7 @@ def login():
         email = login_form.email.data
         password = login_form.password.data
 
-        customer = customer_obj.validataCustomerRegistered(email_addr=email, password=password)
+        customer = customer_obj.validateCustomerRegistered(email_addr=email, password=password)
         if customer is None:
             msg = "No user is found with given email, please sign up or check your email"
             return render_template("login.html", form=login_form, msg=msg)
@@ -424,8 +435,6 @@ def update_profile():
             return redirect(url_for('login', msg="Please first log in"))
         else:
             customer_obj = Customer()
-            # TODO: debug if user changes email will this work
-            # FIXME: when email or phone are already taken, block update
             customer_id = customer_obj.getCustomerIdByEmail(session['user_email'])
             if customer_id is None:
                 msg = "You are not registered yet, please sign up first."

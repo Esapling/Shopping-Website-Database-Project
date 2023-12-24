@@ -31,6 +31,20 @@ class Product(DatabaseManagement):
                 # print(products)
                 return products
 
+    # Check is stock available for product, if true return true and decrease stock by 1 else return false
+    def checkStock(self, product_id: int):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                query_junction = f"select inventory from product where product_id=%s"
+                cur.execute(query_junction, (product_id,))
+                stock = cur.fetchone()
+                if stock[0] > 0:
+                    query_junction = f"update product set inventory = inventory - 1 where product_id=%s"
+                    cur.execute(query_junction, (product_id,))
+                    return True
+                else:
+                    return False
+
 
 class Category(DatabaseManagement):
     def __init__(self) -> None:
@@ -59,10 +73,10 @@ class Store(DatabaseManagement):
     def __init__(self) -> None:
         super().__init__(table_name="STORE")
 
-    def getStoreName(self, store_id: int):
+    def getStoreLocation(self, store_id: int):
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:
-                query_junction = f"select store_name from store where store_id=%s"
+                query_junction = f"select location from store where store_id=%s"
                 cur.execute(query_junction, (store_id,))
                 store_name = cur.fetchone()
                 # print(store_name)

@@ -112,7 +112,7 @@ class Order(DatabaseManagement):
                 #  OR...
                 #  --> Simply list all purchased products and their prices with order date and numbers for customer
                 # Listing: order no, order date, total price(?), product name, unit price, product amount
-                query = """SELECT o.order_id AS Order_No, o.order_date AS Date, o.total_price AS Total_order_cost, 
+                query = """SELECT o.order_id AS Order_No, o.order_date AS Date, o.total_price AS Order_total_cost, 
                             p.product_name AS Name, p.price, oj.product_amount AS Amount_bought
                             FROM purchase_order o 
                             LEFT JOIN order_junction oj ON o.order_id = oj.order_id 

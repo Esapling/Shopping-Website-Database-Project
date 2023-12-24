@@ -27,7 +27,8 @@ bootstrap = Bootstrap5(app)
 csrf = CSRFProtect()
 csrf.init_app(app)
 
-# separate relative methods in diff modules with classes
+temporary_items = {} # will keep items temporarily after interval operations
+
 
 """ 
     ✔ : DONE
@@ -59,8 +60,8 @@ csrf.init_app(app)
             [⏳] FIXME: Why is getCategoryProductsWithLikes called and not getCategoryProducts?
                         Also getCategoryProductsWithLikes is not working properly.
             [⏳] Sort alphabetical
-            [⏳] Sort by cost
-            [ ] Add description column
+            [] Sort by cost
+            [✔] Add description column
             [ ] Scrape data for other categories
             [ ] More data (?)
         [⏳] Purchase      
@@ -126,6 +127,7 @@ def purchase(product_id):
 @app.route("/history/<customer_id>", methods=['GET', 'POST'])
 def see_shop_history(customer_id):
     if 'logged_in' not in session or session['logged_in'] is not True:
+        session['redirect_to'] = request.referrer
         return redirect(url_for('login', msg="Please first log in"))
     else:
         order_obj = Order()
@@ -142,6 +144,8 @@ def see_shop_history(customer_id):
 @app.route("/cart/", methods=['GET', 'POST'])
 def cart():
     if 'logged_in' not in session or session['logged_in'] is not True:
+        session['redirect_to'] = request.referrer
+
         return redirect(url_for('login', msg="Please first log in"))
     else:
         customer_obj = Customer()
@@ -170,6 +174,7 @@ def cart():
 @app.route("/cart/checkout/", methods=['POST'])
 def checkout():
     if 'logged_in' not in session or session['logged_in'] is not True:
+        session['redirect_to'] = request.referrer
         return redirect(url_for('login', msg="Please first log in"))
     else:
         customer_obj = Customer()
@@ -278,6 +283,7 @@ def add_to_favs(product_id):
     # check if user logged in first
     print("SUCCESS ON CALLING METHODs")
     if not session.get("user_email", None):
+        session['redirect_to'] = request.referrer
         return redirect(url_for('login', msg="Please first log in"))
     else:
         customer_obj = Customer()
@@ -301,6 +307,7 @@ def remove_from_favs(product_id):
     # check if user logged in first
     print("SUCCESS ON CALLING METHODs")
     if not session.get("user_email", None):
+        session['redirect_to'] = request.referrer
         return redirect(url_for('login', msg="Please first log in"))
     else:
         customer_obj = Customer()
@@ -361,7 +368,8 @@ def home(category_id=0):
     categories = category_obj.getRecords()  # list of tuples each tuple element is a row or record
     if "filtered" in request.args:
         filter_opt = request.args.get('filtered')
-        products = product_obj.sortProductPrices(filter_opt)        
+        products = product_obj.getProductsSorted(filter_opt)  
+        print(products)      
     elif 'search' in request.args:
         searched_product = request.get('search')
         products = product_obj.getProductsWithName(string=searched_product)
@@ -416,9 +424,12 @@ def login():
             session['customer_id'] = customer[4]
             print("THIS IS YOUR EMAIL")
             print(session['user_email'])
-            print(email)
-            print(customer)
-            return render_template("user_page.html", customer=customer, email=email)
+            if 'temp_items' in session:
+                return redirect(url_for(''))
+            if 'redirect_to' in session:
+                return redirect(session.pop('redirect_to'))
+            else:
+                return render_template("user_page.html", customer=customer, email=email)
     else:
         return "INVALID REQUEST"
 
@@ -439,7 +450,6 @@ def sign_up(msg=None):
         customer_obj = Customer()
         customer_id = customer_obj.checkCustomerExistByPhone(customer_phone=customer_dict['phone'])
         if customer_id is None:  # 1st case no user exist
-            print("THIS METHOD WORKED90123")
             customer_obj.addCustomer(customer_dict)
             msg = "You successfully registered, you can log in now."
             return redirect(url_for('login', msg=msg))
@@ -448,11 +458,9 @@ def sign_up(msg=None):
             is_customer_registered = customer_obj.checkCustomerRegisteredById(customer_id)
             if is_customer_registered:
                 msg = f"Welcome {customer_dict['name']}, you have already registered, you can log in."
-                print("THIS METHOD WORKED213")
             else:  # 3rd case customer exists but not registered yet
                 msg = "You successfully registered , you can Log in now"
                 customer_obj.registerCustomer(customer_id, customer_dict["email"], customer_dict["password"])
-                print("THIS METHOD WORKED3123")
             return redirect(url_for('login', msg=msg))
     else:
         return "SOMETHING WENT WRONG"
@@ -478,6 +486,7 @@ def update_profile():
             "email": updateProfileForm.email.data
         }
         if 'logged_in' not in session or session['logged_in'] is not True:
+            session['redirect_to'] = request.referrer
             return redirect(url_for('login', msg="Please first log in"))
         else:
             customer_obj = Customer()
@@ -492,6 +501,7 @@ def update_profile():
                     msg = "User with given email or phone already exists, please try again."
                 # TODO: is there need to update session values?
                 # FIXME: Redirect to user profile page or main page?
+                session['redirect_to'] = request.referrer
                 return redirect(url_for('login', msg=msg))
     else:
         return "SOMETHING WENT WRONG"
@@ -503,6 +513,7 @@ def delete_user(customer_id):
     customer_obj = Customer()
     # customer_id = customer_obj.getCustomerIdByEmail(customer_email)
     if not session.get("user_email", None):
+        session['redirect_to'] = request.referrer
         return redirect(url_for('login', msg="Please first log in"))
     elif customer_id is None:
         msg = "You are not registered yet, please sign up first."
@@ -514,6 +525,7 @@ def delete_user(customer_id):
         session['customer_id'] = None
         msg = "You successfully deleted your profile."
         # flash(msg, 'success')
+        session['redirect_to'] = request.referrer
         return redirect(url_for('login', msg=msg))
 
 

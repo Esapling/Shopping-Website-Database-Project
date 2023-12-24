@@ -35,7 +35,7 @@ temporary_items = {}  # will keep items temporarily after interval operations
     Project Name: Online Shopping Website - "E-Shop"
         Group Members:
             150210733 - Fatih Said Duran 
-            150200713 -  Enes Fidan 
+            150200713 - Enes Fidan 
 
     Project Description:
         This project is an online shopping website. 
@@ -46,7 +46,6 @@ temporary_items = {}  # will keep items temporarily after interval operations
         Products can also be added to their favorites. 
         Users can register to the website and update their profile information. 
         It is possible to even delete their account. 
-        
     
     ✔ : DONE
     ⏳ : WIP
@@ -75,7 +74,8 @@ temporary_items = {}  # will keep items temporarily after interval operations
             [✔] Stay on category page after like/dislike
             [👀] Main page (like/dislike button coloring)
             [?] See only favorites --> getCategoryProductsWithLikes??
-        [⏳] Items (Products) 
+        [✔] Items (Products) 
+            [✔] Display by category
             [✔] Sort alphabetical
             [✔] Sort by cost
             [✔] Add description column
@@ -84,16 +84,18 @@ temporary_items = {}  # will keep items temporarily after interval operations
             [ ] More data (?)
             [~] FIXME: Why is getCategoryProductsWithLikes called and not getCategoryProducts?
                         Also getCategoryProductsWithLikes is not working properly.
-        [👀] Purchase      
+        [✔] Purchase      
             [✔] Check out / Payment - POST /cart/checkout/    + Stock control
             [👀] Mock transaction
             [✔] Bill class --> Create bill after transaction and add to database
             [✔] Add to purchase history
             [👀] Make buy button more visible
+            [✔] Empty cart after purchase
+            [✔] Remove out of stock items from cart when failed to purchase
             [ ] FIXME: Purchase result information message to user 
             [?] Order id to only refer to id related to customer, 
                 purchase_order table primary key would be order id + customer id
-        [[✔] FIXME: Add to cart button CSRF request must be under control] Shoppingcart/box
+        [✔] Shoppingcart/box
             [✔] Add to cart - PUT /cart/
             [✔] See current cart - GET /cart/
             [~] Remove item from cart - DELETE /cart/<item_id>/ --> Click on cart symbol to do so

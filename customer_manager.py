@@ -123,6 +123,15 @@ class Order(DatabaseManagement):
                 order_history = cur.fetchall()
         return order_history
 
+    # Get latest order of a customer
+    def getLatestOrder(self, customer_id):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                query = f"SELECT order_id from {self.table_name} where customer_id = %s ORDER BY order_id DESC LIMIT 1"
+                cur.execute(query, (customer_id,))
+                latest_order = cur.fetchone()
+        return latest_order
+
     def createOrder(self, customer_id):
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:
@@ -164,6 +173,13 @@ class Order(DatabaseManagement):
                              f"on s.product_id = d.product_id where s.inventory < d.count")
                     cur.execute(query)
                     out_of_stock_products = cur.fetchall()
+
+                    # Remove products out of stock from customer_shop_box
+                    query = (f"DELETE FROM customer_shop_box WHERE customer_id = %s AND product_id IN "
+                             f"(SELECT DISTINCT s.product_id from {view_name_c} s join {view_name_p} d "
+                             f"on s.product_id = d.product_id where s.inventory < d.count)")
+                    cur.execute(query, (customer_id,))
+                    connection.commit()
                     connection.close()
                     return out_of_stock_products, False
                 # Stock is available for all products

@@ -1,6 +1,6 @@
 CREATE TABLE PURCHASE_ORDER(
     order_id SERIAL NOT NULL UNIQUE PRIMARY KEY,
-    customer_id INT NOT NULL REFERENCES customer (customer_id) 
+    customer_id INT REFERENCES customer (customer_id) 
         ON DELETE SET NULL
         ON UPDATE CASCADE,
     order_state BOOLEAN DEFAULT FALSE, -- shows if order is reached to the customer ,, simply order is done,

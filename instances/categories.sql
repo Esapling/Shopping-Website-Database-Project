@@ -6,7 +6,8 @@ create table CATEGORY (
              --ON DELETE SET NULL 
             ON DELETE CASCADE
             ON UPDATE CASCADE
-);
+);	
+--sample data
 insert into CATEGORY (category_name,store_id) values ('Electronics',1);
 insert into CATEGORY (category_name,store_id) values ('Grocery',1);
 insert into CATEGORY (category_name,store_id) values ('Automotive',1);

@@ -5,7 +5,7 @@ CREATE TABLE ORDER_JUNCTION (
             ON DELETE CASCADE 
             ON UPDATE CASCADE, --is it possible for an order id to be changed ?? 
 
-    product_id INT NOT NULL REFERENCES PRODUCT (product_id) 
+    product_id INT REFERENCES PRODUCT (product_id) 
             ON DELETE RESTRICT -- an order of which ordered products are not known ???
             ON UPDATE CASCADE,
     

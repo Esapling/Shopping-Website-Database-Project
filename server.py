@@ -293,27 +293,6 @@ def add_favs(product_id):
 ################################################################################################
 #                                          Favorites                                           #
 ################################################################################################
-
-# @app.route("/add_to_favs/<product_id>", methods=['POST'])
-# def favs_manage(product_id):
-#     # check if user logged in first
-#     if not session.get("user_email", None):
-#         return redirect(url_for('login', msg="Please first log in"))
-#     else:
-#         customer_obj = Customer()
-#         customer_id = customer_obj.getCustomerIdByEmail(session['user_email'])
-#         if not (customer_id is None):
-#             fav_box_obj = FavBox()
-#             item_exist = fav_box_obj.searchItem(customer_id=customer_id, product_id=product_id)
-#             if item_exist != None:
-#                 return redirect(url_for('remove_from_favs', product_id=product_id))
-#             else:
-#                 return redirect(url_for('add_to_favs', product_id=product_id))
-#         else:
-#             flash('User is not found')
-#             return redirect(url_for('home'))
-
-
 @app.route("/add_to_favs/<product_id>", methods=['POST', 'GET'])
 def add_to_favs(product_id):
     # check if user logged in first
@@ -357,31 +336,6 @@ def remove_from_favs(product_id):
         else:
             flash('Error:', 'User is not found')
             return redirect(url_for('home'))
-
-
-@app.route("/products/<product_id>")
-def add_box(product_id):
-    return "THERE YOU GO"
-
-
-@app.route("/box/<user_id>")
-def show_box(user_id):
-    pass
-
-
-@app.route("/welcome")
-def register_user():
-    pass
-
-
-@app.route("/users/<user_id>")
-def update_registered_user():
-    pass
-
-
-@app.route("/products/<product_id>")
-def product_page(product_id):
-    pass
 
 
 ################################################################################################
@@ -488,7 +442,7 @@ def sign_up(msg=None):
             customer_obj.addCustomer(customer_dict)
             msg = "You successfully registered, you can log in now."
             return redirect(url_for('login', msg=msg))
-        else:
+        else:   
             # 2nd case , customer_id is not none ->  user with given phone number already registered,
             is_customer_registered = customer_obj.checkCustomerRegisteredById(customer_id)
             if is_customer_registered:
@@ -565,26 +519,8 @@ def delete_user(customer_id):
 
 
 if __name__ == "__main__":
-    # app.config.from_object("config")
-    # port = app.config.get("PORT", 5000)
+    app.config.from_object("config")
+    port = app.config.get("PORT", 5000)
     debug = app.config.get("DEBUG")
     app.run(port=PORT, debug=DEBUG)
 
-"""
-@app.route("/")
-def home():
-    image_url = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRITa7y1G8H3t5etxA6oyfOUO01v_YrImYpkQ&usqp=CAU"
-    category_obj = Category()
-    categories = category_obj.getRecords() # list of tuples each tuple element is a row or record
-    movie.title
-    movie.year
-    movie.ranking
-    movie.review
-    movie.description
-    categories = category_obj.getRecords()
-    print(categories)
-    print(type(categories))
-    return render_template("index.html", image_url = image_url, categories = categories)
-
-    
-    """

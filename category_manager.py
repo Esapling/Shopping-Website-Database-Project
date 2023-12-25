@@ -53,3 +53,16 @@ class Category(DatabaseManagement):
                 else:
                     print("Category Found")
                     return category
+
+    def fetchAllCategories(self):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                query = f"SELECT * FROM {self.table_name}"
+                cur.execute(query)
+                category_list = cur.fetchAll()
+                if not category_list:
+                    print("No Categories Found in Database")
+                    return False
+                else:
+                    print("Fetching Categories from Database is Successfull")
+                    return category_list

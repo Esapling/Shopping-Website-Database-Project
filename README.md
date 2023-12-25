@@ -1,7 +1,7 @@
 # E-Shop - Database Systems Project
 
 A Shopping Website project with a database. 
-This is a ITU BLG317E – DATABASE SYSTEMS course project implemented by Fatih Said Duran and Enes Fidan. 
+This is a ITU BLG317E – DATABASE SYSTEMS course project implemented by Fatih Said Duran, Musa Alperen Demir and Enes Fidan. 
 Aim is to design an efficient database with a frontend website.
 It was developed by using Flask, HTML, CSS, Bootstrap, Javascript, and PostgreSQL.
 

@@ -36,6 +36,7 @@ temporary_items = {}  # will keep items temporarily after interval operations
         Group Members:
             150210733 - Fatih Said Duran 
             150200713 - Enes Fidan 
+            150180105 - Musa Alperen Demir
 
     Project Description:
         This project is an online shopping website. 
@@ -120,19 +121,19 @@ temporary_items = {}  # will keep items temporarily after interval operations
             [ ] Add new item
             [ ] Delete item
             [ ] Update item
-            [ ] Add new category
-            [ ] Delete category
-            [ ] Update category
+            [✔] Add new category
+            [✔] Delete category
+            [✔] Update category
             [ ] Add new user
-            [ ] Delete user
+            [✔] Delete user
             [ ] Update user
             [ ] Add new store
             [ ] Delete store
             [ ] Update store
             [ ] See all transactions
-            [ ] See all users
+            [✔] See all users
             [ ] See all items
-            [ ] See all categories
+            [✔] See all categories
             [ ] See all favorites
             [ ] See all shopping carts
             [ ] See all users

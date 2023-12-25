@@ -33,3 +33,22 @@ class User(DatabaseManagement):
                                (%s,%s,%s,%s,%s)""",
                                (user.email, password, user.name, user.phone, user.address))
             connection.commit()
+
+    def fetchAllUsers(self):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                cur.execute("SELECT *  FROM {self.table_name}")
+                user_list = cur.fetchall()
+                if not user_list:
+                    print("There are no users in database")
+                    return False
+                else:
+                    print("Fetching users from database is successfull")
+                    return user_list
+    
+    def deleteUser(self, user_id):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                query = f"DELETE FROM {self.table_name} WHERE user_id = %s"
+                cur.execute(query, (user_id))
+            connection.commit()

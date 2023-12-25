@@ -28,10 +28,26 @@ csrf = CSRFProtect()
 csrf.init_app(app)
 IMAGE_URL = "https://dlcdnrog.asus.com/rog/media/157809658839.webp"
 
-temporary_items = {} # will keep items temporarily after interval operations
-
+temporary_items = {}  # will keep items temporarily after interval operations
 
 """ 
+    ITU BLG317E – DATABASE SYSTEMS TERM PROJECT
+    Project Name: Online Shopping Website - "E-Shop"
+        Group Members:
+            150210733 - Fatih Said Duran 
+            150200713 - Enes Fidan 
+            150180105 - Musa Alperen Demir
+
+    Project Description:
+        This project is an online shopping website. 
+        It has a main page where users can see all products and filter them by category, 
+        sort them by price and name. 
+        Customers can add products to their shopping cart and purchase them, if they are in stock. 
+        They can see their past transactions through their profile page.
+        Products can also be added to their favorites. 
+        Users can register to the website and update their profile information. 
+        It is possible to even delete their account. 
+    
     ✔ : DONE
     ⏳ : WIP
     ~ : WIP in future
@@ -40,16 +56,18 @@ temporary_items = {} # will keep items temporarily after interval operations
     👀 : Flavor
     X : SKIPPED
     TODO:
-        [⏳] User Profile
+        [✔] User Profile
+            [✔] Login
             [✔] Update
             [✔] When updating, block when email or phone are already taken
             [✔] Delete  
             [✔] Warn user before deletion
             [~] Logout (delete session)
-            [~] Get access to user page from main page
-            [ ] Stay logged in --> do not show login tab when logged in, show user profile tab
+            [✔] Get access to user page from main page
+            [✔] Stay logged in --> do not show login tab when logged in, show user profile tab
                 <<<User tab and login tab should be different>>>
-            [⏳] See past transactions - GET /login/<customer_id>/transactions/
+            [✔] Past transactions query
+            [✔] See past transactions - GET /login/<customer_id>/transactions/
             [X] While signing up address shouldn't be character limited
         [✔] Favorites
             [✔] Insert (like)
@@ -57,40 +75,44 @@ temporary_items = {} # will keep items temporarily after interval operations
             [✔] Stay on category page after like/dislike
             [👀] Main page (like/dislike button coloring)
             [?] See only favorites --> getCategoryProductsWithLikes??
-        [⏳] Items 
-            [⏳] FIXME: Why is getCategoryProductsWithLikes called and not getCategoryProducts?
-                        Also getCategoryProductsWithLikes is not working properly.
-            [⏳] Sort alphabetical
-            [ ] Sort by cost
+        [✔] Items (Products) 
+            [✔] Display by category
+            [✔] Sort alphabetical
+            [✔] Sort by cost
             [✔] Add description column
             [👀] Display description on main page
             [ ] Scrape data for other categories
             [ ] More data (?)
-        [👀] Purchase      
+            [~] FIXME: Why is getCategoryProductsWithLikes called and not getCategoryProducts?
+                        Also getCategoryProductsWithLikes is not working properly.
+        [✔] Purchase      
             [✔] Check out / Payment - POST /cart/checkout/    + Stock control
             [👀] Mock transaction
             [✔] Bill class --> Create bill after transaction and add to database
             [✔] Add to purchase history
             [👀] Make buy button more visible
+            [✔] Empty cart after purchase
+            [✔] Remove out of stock items from cart when failed to purchase
             [ ] FIXME: Purchase result information message to user 
             [?] Order id to only refer to id related to customer, 
                 purchase_order table primary key would be order id + customer id
-        [⏳] Shoppingcart/box
-            [ ] FIXME: Add to cart button CSRF request must be under control
+        [✔] Shoppingcart/box
             [✔] Add to cart - PUT /cart/
             [✔] See current cart - GET /cart/
             [~] Remove item from cart - DELETE /cart/<item_id>/ --> Click on cart symbol to do so
             [✔] Purchase    - POST /cart/checkout/
+            [✔] FIXME: Add to cart button CSRF request must be under control
             [👀] Implement lira button for going to purchase page
         [👀] Webpage design
-            [ ] FIXME: CSRF token checks!!
+            [~] FIXME: CSRF token checks!!
             [ ] Add logo
             [✔] Add site name (remove database title)
-            [ ] Replace login with user profile page
+            [✔] Replace login with user profile page
             [ ] Make products not demo-like (fix descriptions)
             [ ] At signup page leave page button needed 
-            [ ] Update footer information
+            [~] Update footer information
             [?] Product individual pages
+        -------------Order 66 below?------------------
         [X] Stores
             [ ] Store name column required
             [ ] Add products but from new store
@@ -99,42 +121,42 @@ temporary_items = {} # will keep items temporarily after interval operations
             [ ] Add new item
             [ ] Delete item
             [ ] Update item
-            [ ] Add new category
-            [ ] Delete category
-            [ ] Update category
+            [✔] Add new category
+            [✔] Delete category
+            [✔] Update category
             [ ] Add new user
-            [ ] Delete user
+            [✔] Delete user
             [ ] Update user
             [ ] Add new store
             [ ] Delete store
             [ ] Update store
             [ ] See all transactions
-            [ ] See all users
+            [✔] See all users
             [ ] See all items
-            [ ] See all categories
+            [✔] See all categories
             [ ] See all favorites
             [ ] See all shopping carts
             [ ] See all users
-        [X] Searchbar
-            
+        [X] Searchbar    
 """
 
 
 ################################################################################################
-#                                             Purchase/Shop History                            #
+#                                    Purchase/Shop History                                     #
 ################################################################################################
-# TODO
+
 @app.route("/user/", methods=['GET', 'POST'])
 def user_page():
     if 'logged_in' not in session or session['logged_in'] is not True:
         return redirect(url_for('login', msg="Please first log in"))
     else:
-        email = session['user_email'] 
+        email = session['user_email']
         customer = session['user']
-        if email != None and customer != None:
+        if email is not None and customer is not None:
             return render_template("user_page.html", customer=customer, email=email)
         else:
             return redirect(url_for('login', msg="Please first log in"))
+
 
 @app.route("/history/<customer_id>", methods=['GET', 'POST'])
 def see_shop_history(customer_id):
@@ -157,7 +179,6 @@ def see_shop_history(customer_id):
         return render_template('purchase_history.html', products=products_purchased, img_url=IMAGE_URL)
 
 
-
 ################################################################################################
 #                                             Cart                                             #
 ################################################################################################
@@ -170,15 +191,14 @@ def remove_from_cart():
         product_id = request.args.get('product_id')
         customer_obj = Customer()
         customer_id = customer_obj.getCustomerIdByEmail(session['user_email'])
-        if customer_id != None:
+        if customer_id is not None:
             cart_obj = ShopBox()
             cart_obj.remove_from_cart(customer_id=customer_id, product_id=product_id)
             flash('Item successfully removed from cart!', 'success')
             return redirect(request.referrer)
         else:
-                flash('Error:', 'User is not found')
-                return redirect(url_for('home'))
-
+            flash('Error:', 'User is not found')
+            return redirect(url_for('home'))
 
 
 @app.route("/cart/", methods=['GET', 'POST'])
@@ -346,8 +366,8 @@ def remove_from_favs(product_id):
 @app.route('/search', methods=['GET'])
 @app.route("/<category_id>")
 def home(category_id=0):
-    #TODO :user should be able to sort products in a category as well 
-          # now this config only lets user one option amongst search, sort, retrieve from a certain category
+    # TODO :user should be able to sort products in a category as well
+    # now this config only lets user one option amongst search, sort, retrieve from a certain category
     image_url = "https://dlcdnrog.asus.com/rog/media/157809658839.webp"
     # "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRITa7y1G8H3t5etxA6oyfOUO01v_YrImYpkQ&usqp=CAU"
     product_obj = Product()
@@ -446,9 +466,9 @@ def sign_up(msg=None):
             # 2nd case , customer_id is not none ->  user with given phone number already registered,
             is_customer_registered = customer_obj.checkCustomerRegisteredById(customer_id)
             if is_customer_registered:
-                msg = f"Welcome {customer_dict['name']}, you have already registered, you can log in."
+                msg = f"A user with given email or phone number already exists. Please try again"
             else:  # 3rd case customer exists but not registered yet
-                msg = "You successfully registered , you can Log in now"
+                msg = "You successfully registered, you can Log in now"
                 customer_obj.registerCustomer(customer_id, customer_dict["email"], customer_dict["password"])
             return redirect(url_for('login', msg=msg))
     else:

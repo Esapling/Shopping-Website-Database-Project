@@ -63,21 +63,23 @@ class ShopBox(DatabaseManagement):
                 cur.execute(query, (customer_id,))
                 products = cur.fetchall()
         return products
+
     def searchItemInCart(self, customer_id, product_id):
         item_exist = False
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:
                 query = f"SELECT 1 from {self.table_name} where customer_id = %s AND product_id = %s"
-                cur.execute(query, (customer_id,product_id))
+                cur.execute(query, (customer_id, product_id))
                 item_exist = cur.fetchone()
             return item_exist
-        
+
     def remove_from_cart(self, customer_id, product_id):
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:
                 query = f"DELETE FROM {self.table_name} where customer_id = %s AND product_id = %s"
                 cur.execute(query, (customer_id, product_id))
             connection.commit()
+
 
 class Order(DatabaseManagement):
     def __init__(self) -> None:
@@ -110,7 +112,7 @@ class Order(DatabaseManagement):
                 #  OR...
                 #  --> Simply list all purchased products and their prices with order date and numbers for customer
                 # Listing: order no, order date, total price(?), product name, unit price, product amount
-                query = """SELECT o.order_id AS Order_No, o.order_date AS Date, o.total_price AS Total_order_cost, 
+                query = """SELECT o.order_id AS Order_No, o.order_date AS Date, o.total_price AS Order_total_cost, 
                             p.product_name AS Name, p.price, oj.product_amount AS Amount_bought
                             FROM purchase_order o 
                             LEFT JOIN order_junction oj ON o.order_id = oj.order_id 
@@ -120,6 +122,15 @@ class Order(DatabaseManagement):
                 cur.execute(query, (customer_id,))
                 order_history = cur.fetchall()
         return order_history
+
+    # Get latest order of a customer
+    def getLatestOrder(self, customer_id):
+        with psycopg.connect(**self.db_params) as connection:
+            with connection.cursor() as cur:
+                query = f"SELECT order_id from {self.table_name} where customer_id = %s ORDER BY order_id DESC LIMIT 1"
+                cur.execute(query, (customer_id,))
+                latest_order = cur.fetchone()
+        return latest_order
 
     def createOrder(self, customer_id):
         with psycopg.connect(**self.db_params) as connection:
@@ -136,8 +147,8 @@ class Order(DatabaseManagement):
                 # Handle the case where the cart is empty
                 query = f"SELECT COUNT(*) from {view_name_c}"
                 cur.execute(query)
-                cart_size = cur.fetchone()
-                if cart_size[0] == 0:
+                cart_size = cur.fetchone()[0]
+                if cart_size == 0:
                     connection.close()
                     return None, False
 
@@ -148,19 +159,27 @@ class Order(DatabaseManagement):
                          f"FROM {view_name_c} AS v GROUP BY v.product_id, v.price)")
                 cur.execute(query)
 
-                # Check if stock is available for all products in the cart
-                query = (f"SELECT SUM(s.price) from {view_name_c} s left join {view_name_p} d "
+                # Check if stock is available for all products in the cart --> supply >= demand
+                query = (f"SELECT COUNT(s.product_id), SUM(s.price) from {view_name_c} s left join {view_name_p} d "
                          f"on s.product_id = d.product_id where s.inventory >= d.count")
                 cur.execute(query)
+                num_in_stock, total_price = cur.fetchone()
 
                 # Handle the case where a product stock is not enough
-                total_price = cur.fetchone()
                 # Stock is not available for at least one product
-                if total_price[0] is None:  # total_price[0][0] is None:
+                if num_in_stock < cart_size:  # total_price[0][0] is None:
                     # Find the products that are out of stock to inform the user
-                    query = f"SELECT csb.product_name from {view_name_c} csb where csb.inventory = 0 "
+                    query = (f"SELECT DISTINCT s.product_name from {view_name_c} s join {view_name_p} d "
+                             f"on s.product_id = d.product_id where s.inventory < d.count")
                     cur.execute(query)
                     out_of_stock_products = cur.fetchall()
+
+                    # Remove products out of stock from customer_shop_box
+                    query = (f"DELETE FROM customer_shop_box WHERE customer_id = %s AND product_id IN "
+                             f"(SELECT DISTINCT s.product_id from {view_name_c} s join {view_name_p} d "
+                             f"on s.product_id = d.product_id where s.inventory < d.count)")
+                    cur.execute(query, (customer_id,))
+                    connection.commit()
                     connection.close()
                     return out_of_stock_products, False
                 # Stock is available for all products
@@ -173,7 +192,7 @@ class Order(DatabaseManagement):
                     # (Order state is true for now, it will be updated only after the order is delivered)
                     query = (f"INSERT INTO {self.table_name} (customer_id, order_state, total_price) "
                              f"VALUES (%s, true, %s) RETURNING order_id")
-                    cur.execute(query, (customer_id, total_price[0]))
+                    cur.execute(query, (customer_id, total_price))
 
                     # Get the last inserted ID
                     last_inserted_order_id = cur.fetchone()[0]
@@ -278,6 +297,7 @@ class Customer(DatabaseManagement):
                 cur.execute(query, (customer_id,))
                 products = cur.fetchall()
         return products
+
     def addItemToCart(self, customer_id, product_id):
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:

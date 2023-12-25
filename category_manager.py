@@ -17,7 +17,7 @@ class Category(DatabaseManagement):
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:
                 query = f"DELETE FROM {self.table_name} WHERE category_id=%s"
-                cur.execute(query, (category_id))
+                cur.execute(query, category_id)
             connection.commit()
 
     def updateCategory(self, category_id, category_name,store_id):
@@ -31,7 +31,7 @@ class Category(DatabaseManagement):
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:
                 query = f"SELECT * FROM {self.table_name} WHERE category_id=%s" 
-                cur.execute(query,(category_id)
+                cur.execute(query,(category_id))
                 category = cur.fetchAll()
                 if not category:
                     print("No category found with given Category Id")
@@ -45,7 +45,7 @@ class Category(DatabaseManagement):
         with psycopg.connect(**self.db_params) as connection:
             with connection.cursor() as cur:
                 query = f"SELECT * FROM {self.table_name} WHERE category_name=%s AND store_id=%s" 
-                cur.execute(query,(category_name, store_id)
+                cur.execute(query,(category_name, store_id))
                 category = cur.fetchAll()
                 if not category:
                     print("No category found with given parameters")
